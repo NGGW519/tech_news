@@ -1,0 +1,23 @@
+# 자격 증명 — 절대 커밋 금지
+.env
+.env.*
+*.key
+credentials.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# 로컬 실행 산출물
+*.log
+.cache/
+out/
+
+# 에디터 / OS
+.vscode/
+.idea/
+.DS_Store*:Zone.Identifier

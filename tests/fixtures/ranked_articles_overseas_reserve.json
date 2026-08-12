@@ -1,0 +1,41 @@
+[
+  {
+    "article": {
+      "article_id": "rss:arxiv:2608.05119",
+      "origin": "overseas",
+      "source": "rss",
+      "title": "RoboCat-2: Scaling cross-embodiment self-improvement to 200 tasks",
+      "url": "https://arxiv.org/abs/2608.05119",
+      "publisher": "arXiv",
+      "published_at": "2026-08-14T09:00:00+09:00",
+      "collected_at": "2026-08-17T08:12:55+09:00",
+      "metrics": {
+        "points": null,
+        "comments": null,
+        "upvotes": null
+      },
+      "description": "We scale self-improving cross-embodiment training to 200 manipulation tasks across 9 platforms, showing that autonomously collected rollouts can replace 78% of teleoperated demonstrations.",
+      "query": "arxiv",
+      "extra": {
+        "feed_url": "http://export.arxiv.org/api/query?search_query=cat:cs.RO",
+        "guid": "https://arxiv.org/abs/2608.05119",
+        "normalized_url": "https://arxiv.org/abs/2608.05119"
+      }
+    },
+    "rank": 1,
+    "display_title": "RoboCat-2: Scaling cross-embodiment self-improvement to 200 tasks",
+    "sort_score": -1.0,
+    "evidence": {
+      "origin": "overseas",
+      "cluster_size": null,
+      "cluster_article_ids": [],
+      "cluster_publishers": [],
+      "representative_reason": null,
+      "normalized_score": null,
+      "score_components": {},
+      "merged_article_ids": [
+        "rss:arxiv:2608.05119"
+      ]
+    }
+  }
+]

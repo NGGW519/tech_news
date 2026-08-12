@@ -3,7 +3,7 @@
     "rank": 1,
     "origin": "overseas",
     "title": "Figure raises $1.5B at $39B valuation",
-    "url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d/",
+    "url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d",
     "summary_lines": [
       "휴머노이드 스타트업 피규어가 시리즈 D를 마감했다.",
       "BMW 공장 실배치 실적이 평가에 결정적으로 작용했다."
@@ -17,7 +17,7 @@
     "rank": 2,
     "origin": "overseas",
     "title": "1X opens NEO home robot preorders at $20k",
-    "url": "https://www.1x.tech/discover/neo-preorders",
+    "url": "https://1x.tech/discover/neo-preorders",
     "summary_lines": [
       "가격은 2만 달러이며 월 구독형 옵션도 함께 연다.",
       "가정용 휴머노이드의 첫 대규모 사전예약 사례다."
@@ -31,7 +31,7 @@
     "rank": 3,
     "origin": "overseas",
     "title": "Physical Intelligence open-sources π-0.6 VLA weights and the fine-tuning stack",
-    "url": "https://www.physicalintelligence.company/blog/pi06-open-weights?utm_source=reddit&utm_medium=social",
+    "url": "https://physicalintelligence.company/blog/pi06-open-weights",
     "summary_lines": [
       "파인튜닝 스택과 학습 코드가 가중치와 함께 풀렸다.",
       "폐쇄형 VLA와의 성능 격차가 빠르게 좁혀지고 있다."
@@ -45,7 +45,7 @@
     "rank": 4,
     "origin": "overseas",
     "title": "Waymo opens freeway driving to all riders in three metros",
-    "url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone/",
+    "url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone",
     "summary_lines": [],
     "publisher": "Waymo",
     "published_at": "2026-08-13T22:40:00+09:00",
@@ -56,7 +56,7 @@
     "rank": 5,
     "origin": "overseas",
     "title": "Unitree G1 teardown: BOM breakdown and what the $16k price actually buys",
-    "url": "https://www.reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown/",
+    "url": "https://reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown",
     "summary_lines": [
       "Spent two weeks disassembling a G1 down to the last harmonic drive. Full parts list with supplier part numbers, actuator ⚠️ 자동 요약 실패"
     ],

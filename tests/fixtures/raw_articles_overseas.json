@@ -1,0 +1,281 @@
+[
+  {
+    "article_id": "reddit:1mpz8vr",
+    "origin": "overseas",
+    "source": "reddit",
+    "title": "[R] Cross-embodiment transfer without paired data (NeurIPS 2026 submission)",
+    "url": "https://arxiv.org/abs/2608.04417",
+    "publisher": "arXiv",
+    "published_at": "2026-08-11T06:30:12+09:00",
+    "collected_at": "2026-08-17T08:12:55+09:00",
+    "metrics": {
+      "points": null,
+      "comments": 97,
+      "upvotes": 892
+    },
+    "description": "",
+    "query": "r/MachineLearning",
+    "extra": {
+      "subreddit": "MachineLearning",
+      "is_self": false,
+      "upvote_ratio": 0.94,
+      "domain": "arxiv.org",
+      "normalized_url": "https://arxiv.org/abs/2608.04417"
+    }
+  },
+  {
+    "article_id": "reddit:1mq0a4b",
+    "origin": "overseas",
+    "source": "reddit",
+    "title": "Unitree G1 teardown: BOM breakdown and what the $16k price actually buys",
+    "url": "https://www.reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown/",
+    "publisher": "Reddit r/robotics",
+    "published_at": "2026-08-11T13:18:00+09:00",
+    "collected_at": "2026-08-17T08:12:55+09:00",
+    "metrics": {
+      "points": null,
+      "comments": 156,
+      "upvotes": 1104
+    },
+    "description": "Spent two weeks disassembling a G1 down to the last harmonic drive. Full parts list with supplier part numbers, actuator torque specs measured on a bench dyno, and my cost estimates for each subassembly are below.",
+    "query": "r/robotics",
+    "extra": {
+      "subreddit": "robotics",
+      "is_self": true,
+      "upvote_ratio": 0.98,
+      "domain": "self.robotics",
+      "normalized_url": "https://reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown"
+    }
+  },
+  {
+    "article_id": "hn:41236780",
+    "origin": "overseas",
+    "source": "hacker_news",
+    "title": "Figure raises $1.5B at $39B valuation",
+    "url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d/",
+    "publisher": "TechCrunch",
+    "published_at": "2026-08-11T23:22:31+09:00",
+    "collected_at": "2026-08-17T08:12:55+09:00",
+    "metrics": {
+      "points": 842,
+      "comments": 331,
+      "upvotes": null
+    },
+    "description": "",
+    "query": "hn_front_page",
+    "extra": {
+      "hn_author": "todsacerdoti",
+      "hn_item_url": "https://news.ycombinator.com/item?id=41236780",
+      "created_at_i": 1786458151,
+      "normalized_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d"
+    }
+  },
+  {
+    "article_id": "reddit:1mr2h8k",
+    "origin": "overseas",
+    "source": "reddit",
+    "title": "Figure raises $1.5B at $39B valuation",
+    "url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d/?utm_source=reddit",
+    "publisher": "TechCrunch",
+    "published_at": "2026-08-12T01:10:00+09:00",
+    "collected_at": "2026-08-17T08:12:55+09:00",
+    "metrics": {
+      "points": null,
+      "comments": 342,
+      "upvotes": 1870
+    },
+    "description": "",
+    "query": "r/robotics",
+    "extra": {
+      "subreddit": "robotics",
+      "is_self": false,
+      "upvote_ratio": 0.91,
+      "domain": "techcrunch.com",
+      "normalized_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d"
+    }
+  },
+  {
+    "article_id": "hn:41240355",
+    "origin": "overseas",
+    "source": "hacker_news",
+    "title": "1X opens NEO home robot preorders at $20k",
+    "url": "https://www.1x.tech/discover/neo-preorders",
+    "publisher": "1X",
+    "published_at": "2026-08-12T05:30:00+09:00",
+    "collected_at": "2026-08-17T08:12:55+09:00",
+    "metrics": {
+      "points": 731,
+      "comments": 604,
+      "upvotes": null
+    },
+    "description": "",
+    "query": "hn_front_page",
+    "extra": {
+      "hn_author": "mfiguiere",
+      "hn_item_url": "https://news.ycombinator.com/item?id=41240355",
+      "created_at_i": 1786480200,
+      "normalized_url": "https://www.1x.tech/discover/neo-preorders"
+    }
+  },
+  {
+    "article_id": "reddit:1mqk4pz",
+    "origin": "overseas",
+    "source": "reddit",
+    "title": "Physical Intelligence open-sources π-0.6 VLA weights and the fine-tuning stack",
+    "url": "https://www.physicalintelligence.company/blog/pi06-open-weights?utm_source=reddit&utm_medium=social",
+    "publisher": "Physical Intelligence",
+    "published_at": "2026-08-12T12:41:07+09:00",
+    "collected_at": "2026-08-17T08:12:55+09:00",
+    "metrics": {
+      "points": null,
+      "comments": 214,
+      "upvotes": 3120
+    },
+    "description": "",
+    "query": "r/robotics",
+    "extra": {
+      "subreddit": "robotics",
+      "is_self": false,
+      "upvote_ratio": 0.97,
+      "domain": "physicalintelligence.company",
+      "normalized_url": "https://physicalintelligence.company/blog/pi06-open-weights"
+    }
+  },
+  {
+    "article_id": "rss:deepmind:gemini-robotics-1-5",
+    "origin": "overseas",
+    "source": "rss",
+    "title": "Gemini Robotics 1.5 brings agentic capabilities to the physical world",
+    "url": "https://deepmind.google/discover/blog/gemini-robotics-1-5/",
+    "publisher": "Google DeepMind",
+    "published_at": "2026-08-13T01:00:00+09:00",
+    "collected_at": "2026-08-17T08:12:55+09:00",
+    "metrics": {
+      "points": null,
+      "comments": null,
+      "upvotes": null
+    },
+    "description": "Gemini Robotics 1.5 and Gemini Robotics-ER 1.5 introduce a thinking step before acting, letting robots plan multi-step tasks and transfer skills between different embodiments.",
+    "query": "deepmind",
+    "extra": {
+      "feed_url": "https://deepmind.google/blog/rss.xml",
+      "guid": "https://deepmind.google/discover/blog/gemini-robotics-1-5/",
+      "normalized_url": "https://deepmind.google/discover/blog/gemini-robotics-1-5"
+    }
+  },
+  {
+    "article_id": "hn:41244517",
+    "origin": "overseas",
+    "source": "hacker_news",
+    "title": "Gemini Robotics 1.5 brings agentic capabilities to the physical world",
+    "url": "https://deepmind.google/discover/blog/gemini-robotics-1-5/",
+    "publisher": "Google DeepMind",
+    "published_at": "2026-08-13T01:05:00+09:00",
+    "collected_at": "2026-08-17T08:12:55+09:00",
+    "metrics": {
+      "points": 396,
+      "comments": 88,
+      "upvotes": null
+    },
+    "description": "",
+    "query": "hn_front_page",
+    "extra": {
+      "hn_author": "meetpateltech",
+      "hn_item_url": "https://news.ycombinator.com/item?id=41244517",
+      "created_at_i": 1786550700,
+      "normalized_url": "https://deepmind.google/discover/blog/gemini-robotics-1-5"
+    }
+  },
+  {
+    "article_id": "hn:41248903",
+    "origin": "overseas",
+    "source": "hacker_news",
+    "title": "Show HN: I ported ROS 2 nav stack to a $40 microcontroller",
+    "url": "https://github.com/mreinhardt/nano-nav2",
+    "publisher": "GitHub",
+    "published_at": "2026-08-13T11:11:04+09:00",
+    "collected_at": "2026-08-17T08:12:55+09:00",
+    "metrics": {
+      "points": 517,
+      "comments": 143,
+      "upvotes": null
+    },
+    "description": "",
+    "query": "hn_front_page",
+    "extra": {
+      "hn_author": "mreinhardt",
+      "hn_item_url": "https://news.ycombinator.com/item?id=41248903",
+      "created_at_i": 1786587064,
+      "normalized_url": "https://github.com/mreinhardt/nano-nav2"
+    }
+  },
+  {
+    "article_id": "hn:41253117",
+    "origin": "overseas",
+    "source": "hacker_news",
+    "title": "Waymo opens freeway driving to all riders in three metros",
+    "url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone/",
+    "publisher": "Waymo",
+    "published_at": "2026-08-13T22:40:00+09:00",
+    "collected_at": "2026-08-17T08:12:55+09:00",
+    "metrics": {
+      "points": 664,
+      "comments": 512,
+      "upvotes": null
+    },
+    "description": "",
+    "query": "hn_front_page",
+    "extra": {
+      "hn_author": "jbredeche",
+      "hn_item_url": "https://news.ycombinator.com/item?id=41253117",
+      "created_at_i": 1786628400,
+      "normalized_url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone"
+    }
+  },
+  {
+    "article_id": "rss:arxiv:2608.05119",
+    "origin": "overseas",
+    "source": "rss",
+    "title": "RoboCat-2: Scaling cross-embodiment self-improvement to 200 tasks",
+    "url": "https://arxiv.org/abs/2608.05119",
+    "publisher": "arXiv",
+    "published_at": "2026-08-14T09:00:00+09:00",
+    "collected_at": "2026-08-17T08:12:55+09:00",
+    "metrics": {
+      "points": null,
+      "comments": null,
+      "upvotes": null
+    },
+    "description": "We scale self-improving cross-embodiment training to 200 manipulation tasks across 9 platforms, showing that autonomously collected rollouts can replace 78% of teleoperated demonstrations.",
+    "query": "arxiv",
+    "extra": {
+      "feed_url": "http://export.arxiv.org/api/query?search_query=cat:cs.RO",
+      "guid": "https://arxiv.org/abs/2608.05119",
+      "normalized_url": "https://arxiv.org/abs/2608.05119"
+    }
+  },
+  {
+    "article_id": "reddit:1mr7t2c",
+    "origin": "overseas",
+    "source": "reddit",
+    "title": "Why did every humanoid startup switch to quasi-direct-drive actuators in the last 18 months?",
+    "url": "https://www.reddit.com/r/robotics/comments/1mr7t2c/why_did_every_humanoid_startup_switch_to/",
+    "publisher": "Reddit r/robotics",
+    "published_at": "2026-08-14T09:20:00+09:00",
+    "collected_at": "2026-08-17T08:12:55+09:00",
+    "metrics": {
+      "points": null,
+      "comments": 268,
+      "upvotes": 431
+    },
+    "description": "",
+    "query": "r/robotics",
+    "extra": {
+      "subreddit": "robotics",
+      "is_self": true,
+      "upvote_ratio": 0.96,
+      "domain": "self.robotics",
+      "normalized_url": "https://reddit.com/r/robotics/comments/1mr7t2c/why_did_every_humanoid_startup_switch_to"
+    }
+  }
+]

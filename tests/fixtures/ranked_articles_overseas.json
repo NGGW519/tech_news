@@ -1,0 +1,216 @@
+[
+  {
+    "article": {
+      "article_id": "hn:41236780",
+      "origin": "overseas",
+      "source": "hacker_news",
+      "title": "Figure raises $1.5B at $39B valuation",
+      "url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d/",
+      "publisher": "TechCrunch",
+      "published_at": "2026-08-11T23:22:31+09:00",
+      "collected_at": "2026-08-17T08:12:55+09:00",
+      "metrics": {
+        "points": 842,
+        "comments": 331,
+        "upvotes": null
+      },
+      "description": "",
+      "query": "hn_front_page",
+      "extra": {
+        "hn_author": "todsacerdoti",
+        "hn_item_url": "https://news.ycombinator.com/item?id=41236780",
+        "created_at_i": 1786458151,
+        "normalized_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d"
+      }
+    },
+    "rank": 1,
+    "display_title": "Figure raises $1.5B at $39B valuation",
+    "sort_score": 1.66032,
+    "evidence": {
+      "origin": "overseas",
+      "cluster_size": null,
+      "cluster_article_ids": [],
+      "cluster_publishers": [],
+      "representative_reason": null,
+      "normalized_score": 1.66032,
+      "score_components": {
+        "hacker_news": 0.91907,
+        "reddit": 0.74125
+      },
+      "merged_article_ids": [
+        "hn:41236780",
+        "reddit:1mr2h8k"
+      ]
+    }
+  },
+  {
+    "article": {
+      "article_id": "hn:41240355",
+      "origin": "overseas",
+      "source": "hacker_news",
+      "title": "1X opens NEO home robot preorders at $20k",
+      "url": "https://www.1x.tech/discover/neo-preorders",
+      "publisher": "1X",
+      "published_at": "2026-08-12T05:30:00+09:00",
+      "collected_at": "2026-08-17T08:12:55+09:00",
+      "metrics": {
+        "points": 731,
+        "comments": 604,
+        "upvotes": null
+      },
+      "description": "",
+      "query": "hn_front_page",
+      "extra": {
+        "hn_author": "mfiguiere",
+        "hn_item_url": "https://news.ycombinator.com/item?id=41240355",
+        "created_at_i": 1786480200,
+        "normalized_url": "https://www.1x.tech/discover/neo-preorders"
+      }
+    },
+    "rank": 2,
+    "display_title": "1X opens NEO home robot preorders at $20k",
+    "sort_score": 1.0,
+    "evidence": {
+      "origin": "overseas",
+      "cluster_size": null,
+      "cluster_article_ids": [],
+      "cluster_publishers": [],
+      "representative_reason": null,
+      "normalized_score": 1.0,
+      "score_components": {
+        "hacker_news": 1.0
+      },
+      "merged_article_ids": [
+        "hn:41240355"
+      ]
+    }
+  },
+  {
+    "article": {
+      "article_id": "reddit:1mqk4pz",
+      "origin": "overseas",
+      "source": "reddit",
+      "title": "Physical Intelligence open-sources π-0.6 VLA weights and the fine-tuning stack",
+      "url": "https://www.physicalintelligence.company/blog/pi06-open-weights?utm_source=reddit&utm_medium=social",
+      "publisher": "Physical Intelligence",
+      "published_at": "2026-08-12T12:41:07+09:00",
+      "collected_at": "2026-08-17T08:12:55+09:00",
+      "metrics": {
+        "points": null,
+        "comments": 214,
+        "upvotes": 3120
+      },
+      "description": "",
+      "query": "r/robotics",
+      "extra": {
+        "subreddit": "robotics",
+        "is_self": false,
+        "upvote_ratio": 0.97,
+        "domain": "physicalintelligence.company",
+        "normalized_url": "https://physicalintelligence.company/blog/pi06-open-weights"
+      }
+    },
+    "rank": 3,
+    "display_title": "Physical Intelligence open-sources π-0.6 VLA weights and the fine-tuning stack",
+    "sort_score": 1.0,
+    "evidence": {
+      "origin": "overseas",
+      "cluster_size": null,
+      "cluster_article_ids": [],
+      "cluster_publishers": [],
+      "representative_reason": null,
+      "normalized_score": 1.0,
+      "score_components": {
+        "reddit": 1.0
+      },
+      "merged_article_ids": [
+        "reddit:1mqk4pz"
+      ]
+    }
+  },
+  {
+    "article": {
+      "article_id": "hn:41253117",
+      "origin": "overseas",
+      "source": "hacker_news",
+      "title": "Waymo opens freeway driving to all riders in three metros",
+      "url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone/",
+      "publisher": "Waymo",
+      "published_at": "2026-08-13T22:40:00+09:00",
+      "collected_at": "2026-08-17T08:12:55+09:00",
+      "metrics": {
+        "points": 664,
+        "comments": 512,
+        "upvotes": null
+      },
+      "description": "",
+      "query": "hn_front_page",
+      "extra": {
+        "hn_author": "jbredeche",
+        "hn_item_url": "https://news.ycombinator.com/item?id=41253117",
+        "created_at_i": 1786628400,
+        "normalized_url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone"
+      }
+    },
+    "rank": 4,
+    "display_title": "Waymo opens freeway driving to all riders in three metros",
+    "sort_score": 0.8837,
+    "evidence": {
+      "origin": "overseas",
+      "cluster_size": null,
+      "cluster_article_ids": [],
+      "cluster_publishers": [],
+      "representative_reason": null,
+      "normalized_score": 0.8837,
+      "score_components": {
+        "hacker_news": 0.8837
+      },
+      "merged_article_ids": [
+        "hn:41253117"
+      ]
+    }
+  },
+  {
+    "article": {
+      "article_id": "reddit:1mq0a4b",
+      "origin": "overseas",
+      "source": "reddit",
+      "title": "Unitree G1 teardown: BOM breakdown and what the $16k price actually buys",
+      "url": "https://www.reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown/",
+      "publisher": "Reddit r/robotics",
+      "published_at": "2026-08-11T13:18:00+09:00",
+      "collected_at": "2026-08-17T08:12:55+09:00",
+      "metrics": {
+        "points": null,
+        "comments": 156,
+        "upvotes": 1104
+      },
+      "description": "Spent two weeks disassembling a G1 down to the last harmonic drive. Full parts list with supplier part numbers, actuator torque specs measured on a bench dyno, and my cost estimates for each subassembly are below.",
+      "query": "r/robotics",
+      "extra": {
+        "subreddit": "robotics",
+        "is_self": true,
+        "upvote_ratio": 0.98,
+        "domain": "self.robotics",
+        "normalized_url": "https://reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown"
+      }
+    },
+    "rank": 5,
+    "display_title": "Unitree G1 teardown: BOM breakdown and what the $16k price actually buys",
+    "sort_score": 0.47493,
+    "evidence": {
+      "origin": "overseas",
+      "cluster_size": null,
+      "cluster_article_ids": [],
+      "cluster_publishers": [],
+      "representative_reason": null,
+      "normalized_score": 0.47493,
+      "score_components": {
+        "reddit": 0.47493
+      },
+      "merged_article_ids": [
+        "reddit:1mq0a4b"
+      ]
+    }
+  }
+]

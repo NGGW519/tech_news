@@ -1,0 +1,82 @@
+[
+  {
+    "case": "fixture_week",
+    "note": "이 디렉터리의 나머지 fixture 가 속한 주. SPEC 5절 트리의 '8월 2주' 항목과 같다.",
+    "week": {
+      "run_date": "2026-08-17",
+      "window_start": "2026-08-10",
+      "window_end": "2026-08-16",
+      "anchor": "2026-08-13",
+      "year": 2026,
+      "month": 8,
+      "week_no": 2
+    },
+    "expected": {
+      "month_page_title": "2026-08",
+      "week_key": "8월 2주",
+      "week_label": "8월 2주 (08/10~08/16)",
+      "window_start_dt": "2026-08-10T00:00:00+09:00",
+      "window_end_dt": "2026-08-16T23:59:59.999999+09:00"
+    }
+  },
+  {
+    "case": "spec_table_row1",
+    "note": "SPEC 5절 표 1행. 8/31(월) 실행 → 목요일 8/27 → 8월 4주.",
+    "week": {
+      "run_date": "2026-08-31",
+      "window_start": "2026-08-24",
+      "window_end": "2026-08-30",
+      "anchor": "2026-08-27",
+      "year": 2026,
+      "month": 8,
+      "week_no": 4
+    },
+    "expected": {
+      "month_page_title": "2026-08",
+      "week_key": "8월 4주",
+      "week_label": "8월 4주 (08/24~08/30)",
+      "window_start_dt": "2026-08-24T00:00:00+09:00",
+      "window_end_dt": "2026-08-30T23:59:59.999999+09:00"
+    }
+  },
+  {
+    "case": "spec_table_row2_month_crossing",
+    "note": "SPEC 5절 표 2행. 수집 창이 8월에 걸쳐 있어도 목요일(9/3)이 9월이므로 9월 1주. 라벨의 날짜 범위는 실제 수집 창 그대로.",
+    "week": {
+      "run_date": "2026-09-07",
+      "window_start": "2026-08-31",
+      "window_end": "2026-09-06",
+      "anchor": "2026-09-03",
+      "year": 2026,
+      "month": 9,
+      "week_no": 1
+    },
+    "expected": {
+      "month_page_title": "2026-09",
+      "week_key": "9월 1주",
+      "week_label": "9월 1주 (08/31~09/06)",
+      "window_start_dt": "2026-08-31T00:00:00+09:00",
+      "window_end_dt": "2026-09-06T23:59:59.999999+09:00"
+    }
+  },
+  {
+    "case": "year_crossing_5th_week",
+    "note": "연말 경계 + 5주차 동시 발생. 실행일은 2027년이지만 목요일(12/31)이 2026년 12월이므로 2026-12 페이지의 12월 5주에 귀속된다.",
+    "week": {
+      "run_date": "2027-01-04",
+      "window_start": "2026-12-28",
+      "window_end": "2027-01-03",
+      "anchor": "2026-12-31",
+      "year": 2026,
+      "month": 12,
+      "week_no": 5
+    },
+    "expected": {
+      "month_page_title": "2026-12",
+      "week_key": "12월 5주",
+      "week_label": "12월 5주 (12/28~01/03)",
+      "window_start_dt": "2026-12-28T00:00:00+09:00",
+      "window_end_dt": "2027-01-03T23:59:59.999999+09:00"
+    }
+  }
+]

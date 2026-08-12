@@ -1,0 +1,127 @@
+{
+  "hits": [
+    {
+      "created_at": "2026-08-13T13:40:00.000Z",
+      "title": "Waymo opens freeway driving to all riders in three metros",
+      "url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone/",
+      "author": "jbredeche",
+      "points": 664,
+      "story_text": null,
+      "comment_text": null,
+      "num_comments": 512,
+      "story_id": null,
+      "story_title": null,
+      "story_url": null,
+      "parent_id": null,
+      "created_at_i": 1786628400,
+      "relevancy_score": 8321,
+      "_tags": [
+        "story",
+        "author_jbredeche",
+        "story_41253117",
+        "front_page"
+      ],
+      "objectID": "41253117"
+    },
+    {
+      "created_at": "2026-08-13T02:11:04.000Z",
+      "title": "Show HN: I ported ROS 2 nav stack to a $40 microcontroller",
+      "url": "https://github.com/mreinhardt/nano-nav2",
+      "author": "mreinhardt",
+      "points": 517,
+      "story_text": null,
+      "comment_text": null,
+      "num_comments": 143,
+      "story_id": null,
+      "story_title": null,
+      "story_url": null,
+      "parent_id": null,
+      "created_at_i": 1786587064,
+      "relevancy_score": 8050,
+      "_tags": [
+        "story",
+        "author_mreinhardt",
+        "story_41248903",
+        "show_hn"
+      ],
+      "objectID": "41248903"
+    },
+    {
+      "created_at": "2026-08-12T16:05:00.000Z",
+      "title": "Gemini Robotics 1.5 brings agentic capabilities to the physical world",
+      "url": "https://deepmind.google/discover/blog/gemini-robotics-1-5/",
+      "author": "meetpateltech",
+      "points": 396,
+      "story_text": null,
+      "comment_text": null,
+      "num_comments": 88,
+      "story_id": null,
+      "story_title": null,
+      "story_url": null,
+      "parent_id": null,
+      "created_at_i": 1786550700,
+      "relevancy_score": 7779,
+      "_tags": [
+        "story",
+        "author_meetpateltech",
+        "story_41244517"
+      ],
+      "objectID": "41244517"
+    },
+    {
+      "created_at": "2026-08-11T20:30:00.000Z",
+      "title": "1X opens NEO home robot preorders at $20k",
+      "url": "https://www.1x.tech/discover/neo-preorders",
+      "author": "mfiguiere",
+      "points": 731,
+      "story_text": null,
+      "comment_text": null,
+      "num_comments": 604,
+      "story_id": null,
+      "story_title": null,
+      "story_url": null,
+      "parent_id": null,
+      "created_at_i": 1786480200,
+      "relevancy_score": 7508,
+      "_tags": [
+        "story",
+        "author_mfiguiere",
+        "story_41240355",
+        "front_page"
+      ],
+      "objectID": "41240355"
+    },
+    {
+      "created_at": "2026-08-11T14:22:31.000Z",
+      "title": "Figure raises $1.5B at $39B valuation",
+      "url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d/",
+      "author": "todsacerdoti",
+      "points": 842,
+      "story_text": null,
+      "comment_text": null,
+      "num_comments": 331,
+      "story_id": null,
+      "story_title": null,
+      "story_url": null,
+      "parent_id": null,
+      "created_at_i": 1786458151,
+      "relevancy_score": 7237,
+      "_tags": [
+        "story",
+        "author_todsacerdoti",
+        "story_41236780",
+        "front_page"
+      ],
+      "objectID": "41236780"
+    }
+  ],
+  "nbHits": 1284,
+  "page": 0,
+  "nbPages": 50,
+  "hitsPerPage": 20,
+  "exhaustiveNbHits": true,
+  "exhaustiveTypo": true,
+  "query": "",
+  "params": "tags=story&numericFilters=created_at_i%3E1786287600,created_at_i%3C1786892399&hitsPerPage=20",
+  "processingTimeMS": 9
+}

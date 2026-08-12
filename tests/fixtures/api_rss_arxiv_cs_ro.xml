@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>arXiv Query: cat:cs.RO</title>
+  <updated>2026-08-16T23:13:00Z</updated>
+  <entry>
+    <id>http://arxiv.org/abs/2608.05119v1</id>
+    <title>RoboCat-2: Scaling cross-embodiment self-improvement to 200 tasks</title>
+    <published>2026-08-14T00:00:00Z</published>
+    <updated>2026-08-14T00:00:00Z</updated>
+    <summary>We scale self-improving cross-embodiment training to 200 manipulation tasks across 9 platforms, showing that autonomously collected rollouts can replace 78% of teleoperated demonstrations.</summary>
+    <author><name>J. Park</name></author>
+    <link href="https://arxiv.org/abs/2608.05119" rel="alternate" type="text/html"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+</feed>

@@ -1,0 +1,132 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_1mr7t2c",
+    "dist": 5,
+    "modhash": "",
+    "geo_filter": "",
+    "before": null,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "id": "1mqk4pz",
+          "name": "t3_1mqk4pz",
+          "subreddit": "robotics",
+          "subreddit_name_prefixed": "r/robotics",
+          "title": "Physical Intelligence open-sources π-0.6 VLA weights and the fine-tuning stack",
+          "selftext": "",
+          "url": "https://www.physicalintelligence.company/blog/pi06-open-weights?utm_source=reddit&utm_medium=social",
+          "permalink": "/r/robotics/comments/1mqk4pz/",
+          "domain": "physicalintelligence.company",
+          "author": "grasp_planner",
+          "ups": 3120,
+          "score": 3120,
+          "upvote_ratio": 0.97,
+          "num_comments": 214,
+          "created_utc": 1786506067.0,
+          "is_self": false,
+          "over_18": false,
+          "stickied": false,
+          "link_flair_text": "News"
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "id": "1mr2h8k",
+          "name": "t3_1mr2h8k",
+          "subreddit": "robotics",
+          "subreddit_name_prefixed": "r/robotics",
+          "title": "Figure raises $1.5B at $39B valuation",
+          "selftext": "",
+          "url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d/?utm_source=reddit",
+          "permalink": "/r/robotics/comments/1mr2h8k/",
+          "domain": "techcrunch.com",
+          "author": "hn_crosspost",
+          "ups": 1870,
+          "score": 1870,
+          "upvote_ratio": 0.91,
+          "num_comments": 342,
+          "created_utc": 1786464600.0,
+          "is_self": false,
+          "over_18": false,
+          "stickied": false,
+          "link_flair_text": "News"
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "id": "1mq0a4b",
+          "name": "t3_1mq0a4b",
+          "subreddit": "robotics",
+          "subreddit_name_prefixed": "r/robotics",
+          "title": "Unitree G1 teardown: BOM breakdown and what the $16k price actually buys",
+          "selftext": "Spent two weeks disassembling a G1 down to the last harmonic drive. Full parts list with supplier part numbers, actuator torque specs measured on a bench dyno, and my cost estimates for each subassembly are below.",
+          "url": "https://www.reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown/",
+          "permalink": "/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown/",
+          "domain": "self.robotics",
+          "author": "servo_whisperer",
+          "ups": 1104,
+          "score": 1104,
+          "upvote_ratio": 0.98,
+          "num_comments": 156,
+          "created_utc": 1786421880.0,
+          "is_self": true,
+          "over_18": false,
+          "stickied": false,
+          "link_flair_text": "Discussion"
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "id": "1mpz8vr",
+          "name": "t3_1mpz8vr",
+          "subreddit": "MachineLearning",
+          "subreddit_name_prefixed": "r/MachineLearning",
+          "title": "[R] Cross-embodiment transfer without paired data (NeurIPS 2026 submission)",
+          "selftext": "",
+          "url": "https://arxiv.org/abs/2608.04417",
+          "permalink": "/r/MachineLearning/comments/1mpz8vr/",
+          "domain": "arxiv.org",
+          "author": "latent_dynamics",
+          "ups": 892,
+          "score": 892,
+          "upvote_ratio": 0.94,
+          "num_comments": 97,
+          "created_utc": 1786397412.0,
+          "is_self": false,
+          "over_18": false,
+          "stickied": false,
+          "link_flair_text": "Research"
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "id": "1mr7t2c",
+          "name": "t3_1mr7t2c",
+          "subreddit": "robotics",
+          "subreddit_name_prefixed": "r/robotics",
+          "title": "Why did every humanoid startup switch to quasi-direct-drive actuators in the last 18 months?",
+          "selftext": "",
+          "url": "https://www.reddit.com/r/robotics/comments/1mr7t2c/why_did_every_humanoid_startup_switch_to/",
+          "permalink": "/r/robotics/comments/1mr7t2c/why_did_every_humanoid_startup_switch_to/",
+          "domain": "self.robotics",
+          "author": "tendon_driven",
+          "ups": 431,
+          "score": 431,
+          "upvote_ratio": 0.96,
+          "num_comments": 268,
+          "created_utc": 1786666800.0,
+          "is_self": true,
+          "over_18": false,
+          "stickied": false,
+          "link_flair_text": "Discussion"
+        }
+      }
+    ]
+  }
+}

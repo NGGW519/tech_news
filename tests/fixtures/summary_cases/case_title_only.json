@@ -1,0 +1,87 @@
+{
+  "case": "title_only",
+  "note": "요약 입력이 제목뿐인 항목. 보강 실패(`enrich_text` 없음) + `description` 없음 → SPEC 7절 조건부 규칙이 발동하고, 그 규칙을 지킨 **정상 산출물**이 나온다.",
+  "why": "메인 5건에서 이 조건이 성립하는 항목(해외 4위)은 Gemini 호출까지 실패해 요약 줄 생략으로 끝난다. 조건은 덮이지만 '규칙을 지킨 요약'은 덮이지 않았다. 이 케이스가 그 빈칸이다.",
+  "spec_refs": [
+    "6.5절 산출물",
+    "7절 조건부 규칙 — 본문이 제목뿐인 경우"
+  ],
+  "input": {
+    "ranked_article": {
+      "article": {
+        "article_id": "hn:41260114",
+        "origin": "overseas",
+        "source": "hacker_news",
+        "title": "Toyota Research Institute open-sources its whole-body teleop stack",
+        "url": "https://www.tri.global/news/open-sourcing-whole-body-teleop/",
+        "publisher": "Toyota Research Institute",
+        "published_at": "2026-08-14T02:15:00+09:00",
+        "collected_at": "2026-08-17T08:12:55+09:00",
+        "metrics": {
+          "points": 288,
+          "comments": 96,
+          "upvotes": null
+        },
+        "description": "",
+        "query": "hn_front_page",
+        "extra": {
+          "hn_author": "rbanffy",
+          "hn_item_url": "https://news.ycombinator.com/item?id=41260114",
+          "created_at_i": 1786727700,
+          "normalized_url": "https://tri.global/news/open-sourcing-whole-body-teleop",
+          "anchor_url": "https://www.tri.global/news/open-sourcing-whole-body-teleop/",
+          "enrich_status": "failed",
+          "enrich_url": "https://www.tri.global/news/open-sourcing-whole-body-teleop/"
+        }
+      },
+      "rank": 1,
+      "display_title": "Toyota Research Institute open-sources its whole-body teleop stack",
+      "sort_score": 0.4123,
+      "evidence": {
+        "origin": "overseas",
+        "cluster_size": null,
+        "cluster_article_ids": [],
+        "cluster_publishers": [],
+        "representative_reason": null,
+        "normalized_score": 0.4123,
+        "score_components": {
+          "hacker_news": 0.4123
+        },
+        "merged_article_ids": [
+          "hn:41260114"
+        ]
+      }
+    },
+    "summary_input": {
+      "source": "title_only",
+      "text": null,
+      "resolved_by": "enrich_text 없음 → description 빈 문자열 → 제목만 (SPEC 6.5절 우선순위)",
+      "prompt_variant": "overseas",
+      "conditional_title_only_rule": true,
+      "appended_instruction": "본문이 제목뿐인 경우 제목에 없는 사실을 추측하지 말 것.\n두 문장 모두 제목의 맥락 설명에만 쓸 것."
+    }
+  },
+  "expected": {
+    "brief_item": {
+      "rank": 1,
+      "origin": "overseas",
+      "title": "Toyota Research Institute open-sources its whole-body teleop stack",
+      "url": "https://www.tri.global/news/open-sourcing-whole-body-teleop/",
+      "summary_lines": [
+        "로봇 원격조작 소프트웨어는 그동안 기업 내부 자산이었다.",
+        "공개되면 소규모 연구실도 같은 방식으로 데이터를 모은다."
+      ],
+      "publisher": "Toyota Research Institute",
+      "published_at": "2026-08-14T02:15:00+09:00",
+      "summary_status": "gemini",
+      "source_article_id": "hn:41260114"
+    },
+    "rendered": "**1. Toyota Research Institute open-sources its whole-body teleop stack**\n    로봇 원격조작 소프트웨어는 그동안 기업 내부 자산이었다.\n    공개되면 소규모 연구실도 같은 방식으로 데이터를 모은다.\n    Toyota Research Institute · 08/14",
+    "assertions": [
+      "두 문장 어디에도 제목에 없는 **구체적 사실**(수치·날짜·라이선스명·성능)이 없다",
+      "문장 1·2 모두 제목이 말한 사건의 맥락이다 — 7절 조건부 규칙 준수",
+      "요약이 성공했으므로 summary_status 는 gemini 이고 2문장 × 40자 형식 규칙이 적용된다",
+      "url 은 anchor_url — 원본의 `www.` 와 후행 슬래시가 그대로 살아 있다 (normalized_url 이 아니다)"
+    ]
+  }
+}

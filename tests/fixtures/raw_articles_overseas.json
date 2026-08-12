@@ -20,7 +20,8 @@
       "is_self": false,
       "upvote_ratio": 0.94,
       "domain": "arxiv.org",
-      "normalized_url": "https://arxiv.org/abs/2608.04417"
+      "normalized_url": "https://arxiv.org/abs/2608.04417",
+      "anchor_url": "https://arxiv.org/abs/2608.04417"
     }
   },
   {
@@ -44,7 +45,8 @@
       "is_self": true,
       "upvote_ratio": 0.98,
       "domain": "self.robotics",
-      "normalized_url": "https://reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown"
+      "normalized_url": "https://reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown",
+      "anchor_url": "https://www.reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown/"
     }
   },
   {
@@ -67,7 +69,8 @@
       "hn_author": "todsacerdoti",
       "hn_item_url": "https://news.ycombinator.com/item?id=41236780",
       "created_at_i": 1786458151,
-      "normalized_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d"
+      "normalized_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d",
+      "anchor_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d/"
     }
   },
   {
@@ -91,7 +94,8 @@
       "is_self": false,
       "upvote_ratio": 0.91,
       "domain": "techcrunch.com",
-      "normalized_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d"
+      "normalized_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d",
+      "anchor_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d/"
     }
   },
   {
@@ -114,7 +118,8 @@
       "hn_author": "mfiguiere",
       "hn_item_url": "https://news.ycombinator.com/item?id=41240355",
       "created_at_i": 1786480200,
-      "normalized_url": "https://1x.tech/discover/neo-preorders"
+      "normalized_url": "https://1x.tech/discover/neo-preorders",
+      "anchor_url": "https://www.1x.tech/discover/neo-preorders"
     }
   },
   {
@@ -138,7 +143,8 @@
       "is_self": false,
       "upvote_ratio": 0.97,
       "domain": "physicalintelligence.company",
-      "normalized_url": "https://physicalintelligence.company/blog/pi06-open-weights"
+      "normalized_url": "https://physicalintelligence.company/blog/pi06-open-weights",
+      "anchor_url": "https://www.physicalintelligence.company/blog/pi06-open-weights"
     }
   },
   {
@@ -160,7 +166,8 @@
     "extra": {
       "feed_url": "https://deepmind.google/blog/rss.xml",
       "guid": "https://deepmind.google/discover/blog/gemini-robotics-1-5/",
-      "normalized_url": "https://deepmind.google/discover/blog/gemini-robotics-1-5"
+      "normalized_url": "https://deepmind.google/discover/blog/gemini-robotics-1-5",
+      "anchor_url": "https://deepmind.google/discover/blog/gemini-robotics-1-5/"
     }
   },
   {
@@ -183,7 +190,8 @@
       "hn_author": "meetpateltech",
       "hn_item_url": "https://news.ycombinator.com/item?id=41244517",
       "created_at_i": 1786550700,
-      "normalized_url": "https://deepmind.google/discover/blog/gemini-robotics-1-5"
+      "normalized_url": "https://deepmind.google/discover/blog/gemini-robotics-1-5",
+      "anchor_url": "https://deepmind.google/discover/blog/gemini-robotics-1-5/"
     }
   },
   {
@@ -206,7 +214,8 @@
       "hn_author": "mreinhardt",
       "hn_item_url": "https://news.ycombinator.com/item?id=41248903",
       "created_at_i": 1786587064,
-      "normalized_url": "https://github.com/mreinhardt/nano-nav2"
+      "normalized_url": "https://github.com/mreinhardt/nano-nav2",
+      "anchor_url": "https://github.com/mreinhardt/nano-nav2"
     }
   },
   {
@@ -229,7 +238,8 @@
       "hn_author": "jbredeche",
       "hn_item_url": "https://news.ycombinator.com/item?id=41253117",
       "created_at_i": 1786628400,
-      "normalized_url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone"
+      "normalized_url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone",
+      "anchor_url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone/"
     }
   },
   {
@@ -251,7 +261,8 @@
     "extra": {
       "feed_url": "http://export.arxiv.org/api/query?search_query=cat:cs.RO",
       "guid": "https://arxiv.org/abs/2608.05119",
-      "normalized_url": "https://arxiv.org/abs/2608.05119"
+      "normalized_url": "https://arxiv.org/abs/2608.05119",
+      "anchor_url": "https://arxiv.org/abs/2608.05119"
     }
   },
   {
@@ -275,7 +286,8 @@
       "is_self": true,
       "upvote_ratio": 0.96,
       "domain": "self.robotics",
-      "normalized_url": "https://reddit.com/r/robotics/comments/1mr7t2c/why_did_every_humanoid_startup_switch_to"
+      "normalized_url": "https://reddit.com/r/robotics/comments/1mr7t2c/why_did_every_humanoid_startup_switch_to",
+      "anchor_url": "https://www.reddit.com/r/robotics/comments/1mr7t2c/why_did_every_humanoid_startup_switch_to/"
     }
   }
 ]

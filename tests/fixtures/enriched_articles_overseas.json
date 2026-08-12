@@ -21,7 +21,8 @@
         "hn_item_url": "https://news.ycombinator.com/item?id=41236780",
         "created_at_i": 1786458151,
         "normalized_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d",
-        "enrich_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d",
+        "anchor_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d/",
+        "enrich_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d/",
         "enrich_status": "success",
         "enrich_text": "Figure said Monday it has closed a $1.5 billion Series D led by Parkway Venture Capital, with participation from Nvidia's NVentures, Microsoft and Intel Capital. The round values the humanoid robotics company at $39 billion post-money, up from $2.6 billion when it last raised 18 months ago. CEO Brett Adcock said the raise was driven largely by the company's BMW deployment: Figure 03 units have been running body-shop tasks at the Spartanburg plant since March, and the fleet has logged more than 400,000 autonomous part placements to date. Adcock said roughly half the new capital will go toward BotQ, the company's own manufacturing facility, which is targeting an annual run rate of 12,000 units by the end of 2027."
       }
@@ -68,7 +69,8 @@
         "hn_item_url": "https://news.ycombinator.com/item?id=41240355",
         "created_at_i": 1786480200,
         "normalized_url": "https://1x.tech/discover/neo-preorders",
-        "enrich_url": "https://1x.tech/discover/neo-preorders",
+        "anchor_url": "https://www.1x.tech/discover/neo-preorders",
+        "enrich_url": "https://www.1x.tech/discover/neo-preorders",
         "enrich_status": "success",
         "enrich_text": "NEO is available to reserve today for $20,000 outright, or $499 per month on a subscription that bundles maintenance, software updates and access to the teleoperation fallback service. Deliveries begin in the first quarter of 2027 for US customers, with Europe following later that year. Early units ship with the household skill set we have been training since last summer: laundry sorting, dishwasher loading, tidying and door answering. Tasks NEO has not learned can be completed by a remote operator with the owner's explicit, per-session consent. This is the first time a general-purpose home humanoid has been offered to consumers at a published price."
       }
@@ -114,7 +116,8 @@
         "upvote_ratio": 0.97,
         "domain": "physicalintelligence.company",
         "normalized_url": "https://physicalintelligence.company/blog/pi06-open-weights",
-        "enrich_url": "https://physicalintelligence.company/blog/pi06-open-weights",
+        "anchor_url": "https://www.physicalintelligence.company/blog/pi06-open-weights",
+        "enrich_url": "https://www.physicalintelligence.company/blog/pi06-open-weights",
         "enrich_status": "success",
         "enrich_text": "Today we are releasing the weights for pi-0.6, together with the full fine-tuning stack and the training code we use internally. pi-0.6 is a 3.5B-parameter vision-language-action model trained on 12,000 hours of robot interaction data collected across 14 distinct platforms. On our internal manipulation benchmark it closes roughly 80% of the gap to our closed pi-0.7 checkpoint, and it fine-tunes to a new embodiment with as few as 50 demonstrations. Everything is released under Apache 2.0, including the data loaders and the evaluation harness, so results in the paper can be reproduced end to end on a single 8xH100 node."
       }
@@ -159,7 +162,8 @@
         "hn_item_url": "https://news.ycombinator.com/item?id=41253117",
         "created_at_i": 1786628400,
         "normalized_url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone",
-        "enrich_url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone",
+        "anchor_url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone/",
+        "enrich_url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone/",
         "enrich_status": "failed"
       }
     },
@@ -204,7 +208,8 @@
         "upvote_ratio": 0.98,
         "domain": "self.robotics",
         "normalized_url": "https://reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown",
-        "enrich_url": "https://reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown",
+        "anchor_url": "https://www.reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown/",
+        "enrich_url": "https://www.reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown/",
         "enrich_status": "success",
         "enrich_text": "Spent two weeks disassembling a G1 down to the last harmonic drive. Full parts list with supplier part numbers, actuator torque specs measured on a bench dyno, and my cost estimates for each subassembly are below."
       }

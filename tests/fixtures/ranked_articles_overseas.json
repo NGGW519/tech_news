@@ -20,7 +20,8 @@
         "hn_author": "todsacerdoti",
         "hn_item_url": "https://news.ycombinator.com/item?id=41236780",
         "created_at_i": 1786458151,
-        "normalized_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d"
+        "normalized_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d",
+        "anchor_url": "https://techcrunch.com/2026/08/11/figure-raises-1-5b-series-d/"
       }
     },
     "rank": 1,
@@ -64,7 +65,8 @@
         "hn_author": "mfiguiere",
         "hn_item_url": "https://news.ycombinator.com/item?id=41240355",
         "created_at_i": 1786480200,
-        "normalized_url": "https://1x.tech/discover/neo-preorders"
+        "normalized_url": "https://1x.tech/discover/neo-preorders",
+        "anchor_url": "https://www.1x.tech/discover/neo-preorders"
       }
     },
     "rank": 2,
@@ -107,7 +109,8 @@
         "is_self": false,
         "upvote_ratio": 0.97,
         "domain": "physicalintelligence.company",
-        "normalized_url": "https://physicalintelligence.company/blog/pi06-open-weights"
+        "normalized_url": "https://physicalintelligence.company/blog/pi06-open-weights",
+        "anchor_url": "https://www.physicalintelligence.company/blog/pi06-open-weights"
       }
     },
     "rank": 3,
@@ -149,7 +152,8 @@
         "hn_author": "jbredeche",
         "hn_item_url": "https://news.ycombinator.com/item?id=41253117",
         "created_at_i": 1786628400,
-        "normalized_url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone"
+        "normalized_url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone",
+        "anchor_url": "https://waymo.com/blog/2026/08/freeway-driving-for-everyone/"
       }
     },
     "rank": 4,
@@ -192,7 +196,8 @@
         "is_self": true,
         "upvote_ratio": 0.98,
         "domain": "self.robotics",
-        "normalized_url": "https://reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown"
+        "normalized_url": "https://reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown",
+        "anchor_url": "https://www.reddit.com/r/robotics/comments/1mq0a4b/unitree_g1_teardown_bom_breakdown/"
       }
     },
     "rank": 5,

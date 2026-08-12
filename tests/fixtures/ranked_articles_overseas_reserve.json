@@ -19,7 +19,8 @@
       "extra": {
         "feed_url": "http://export.arxiv.org/api/query?search_query=cat:cs.RO",
         "guid": "https://arxiv.org/abs/2608.05119",
-        "normalized_url": "https://arxiv.org/abs/2608.05119"
+        "normalized_url": "https://arxiv.org/abs/2608.05119",
+        "anchor_url": "https://arxiv.org/abs/2608.05119"
       }
     },
     "rank": 1,

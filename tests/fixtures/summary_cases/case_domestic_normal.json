@@ -1,0 +1,90 @@
+{
+  "case": "domestic_normal",
+  "note": "국내 정상 경로. `description` 이 있으므로 요약 입력은 `description` 이고, 국내는 본문 보강 대상이 아니므로 `extra` 에 `enrich_*` 키가 **하나도 없다**.",
+  "why": "SPEC 1.3에서 보강을 해외 한정으로 축소했다. 국내 항목의 extra 에 enrich_* 가 없는 것이 '보강 실패'가 아니라 '애초에 대상이 아님'이라는 점을 고정한다.",
+  "spec_refs": [
+    "4절 앵커 URL — 국내",
+    "6.5절 왜 해외만인가",
+    "7절 프롬프트 규칙 — 국내용"
+  ],
+  "input": {
+    "ranked_article": {
+      "article": {
+        "article_id": "naver:7d2e51ab90c4",
+        "origin": "domestic",
+        "source": "naver_news",
+        "title": "산업용 협동로봇 수출 상반기 32% 증가",
+        "url": "https://www.etnews.com/20260814000198",
+        "publisher": "전자신문",
+        "published_at": "2026-08-14T07:40:00+09:00",
+        "collected_at": "2026-08-17T08:12:41+09:00",
+        "metrics": {
+          "points": null,
+          "comments": null,
+          "upvotes": null
+        },
+        "description": "국내 협동로봇 수출액이 올해 상반기 4억2000만달러로 지난해 같은 기간보다 32% 늘었다. 북미와 유럽의 물류 자동화 수요가 커지면서 중소 제조사 주문이 함께 증가했다.",
+        "query": "로봇",
+        "extra": {
+          "naver_link": "https://n.news.naver.com/mnews/article/030/0003281876?sid=101",
+          "matched_queries": [
+            "로봇"
+          ],
+          "raw_title": "산업용 협동<b>로봇</b> 수출 상반기 32% 증가"
+        }
+      },
+      "rank": 1,
+      "display_title": "산업용 협동로봇 수출 상반기 32% 증가",
+      "sort_score": 3.0,
+      "evidence": {
+        "origin": "domestic",
+        "cluster_size": 3,
+        "cluster_article_ids": [
+          "naver:7d2e51ab90c4",
+          "naver:b31f0c7742ae",
+          "naver:5ac9d0e18b73"
+        ],
+        "cluster_publishers": [
+          "전자신문",
+          "머니투데이",
+          "아시아경제"
+        ],
+        "representative_reason": "earliest_in_cluster",
+        "normalized_score": null,
+        "score_components": {},
+        "merged_article_ids": []
+      }
+    },
+    "summary_input": {
+      "source": "description",
+      "text": "국내 협동로봇 수출액이 올해 상반기 4억2000만달러로 지난해 같은 기간보다 32% 늘었다. 북미와 유럽의 물류 자동화 수요가 커지면서 중소 제조사 주문이 함께 증가했다.",
+      "resolved_by": "국내는 보강 단계를 타지 않는다 → description 채택 (SPEC 6.5절)",
+      "prompt_variant": "domestic",
+      "conditional_title_only_rule": false,
+      "appended_instruction": null
+    }
+  },
+  "expected": {
+    "brief_item": {
+      "rank": 1,
+      "origin": "domestic",
+      "title": "산업용 협동로봇 수출 상반기 32% 증가",
+      "url": "https://www.etnews.com/20260814000198",
+      "summary_lines": [
+        "상반기 수출액은 4억2000만달러로 집계됐다.",
+        "북미·유럽 물류 자동화 수요가 증가분을 이끌었다."
+      ],
+      "publisher": "전자신문",
+      "published_at": "2026-08-14T07:40:00+09:00",
+      "summary_status": "gemini",
+      "source_article_id": "naver:7d2e51ab90c4"
+    },
+    "rendered": "**1. 산업용 협동로봇 수출 상반기 32% 증가**\n    상반기 수출액은 4억2000만달러로 집계됐다.\n    북미·유럽 물류 자동화 수요가 증가분을 이끌었다.\n    전자신문 · 08/14",
+    "assertions": [
+      "extra 에 enrich_status / enrich_text / enrich_url 이 **하나도 없다** — 국내는 보강 대상이 아니다",
+      "문장 1은 제목의 '32% 증가'를 되풀이하지 않고 절대액을 말한다",
+      "url 은 RawArticle.url 원본 그대로 — 국내는 정규화하지 않는다 (SPEC 4절)",
+      "extra 에 normalized_url / anchor_url 이 없다 — 국내에는 URL 정규화 단계가 없다"
+    ]
+  }
+}

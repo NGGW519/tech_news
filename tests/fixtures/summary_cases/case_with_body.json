@@ -1,0 +1,89 @@
+{
+  "case": "with_body",
+  "note": "보강이 성공해 `enrich_text` 가 있는 항목. `description` 은 여전히 빈 문자열이라 요약 입력은 `enrich_text` 다 (SPEC 6.5절 우선순위 1순위).",
+  "why": "SPEC 7절 공통 제약의 '문장 1 = 제목이 말하지 않은 구체적 사실'이 실제로 성립하려면 사실의 출처가 있어야 한다. 그 출처가 `enrich_text` 라는 것을 입력·출력 대응으로 고정한다.",
+  "spec_refs": [
+    "6.5절",
+    "7절 프롬프트 규칙 — 공통 제약"
+  ],
+  "input": {
+    "ranked_article": {
+      "article": {
+        "article_id": "hn:41261882",
+        "origin": "overseas",
+        "source": "hacker_news",
+        "title": "Agility's Digit starts multi-shift work at a GXO warehouse",
+        "url": "https://www.agilityrobotics.com/blog/digit-gxo-multi-shift/?utm_campaign=launch&utm_medium=email",
+        "publisher": "Agility Robotics",
+        "published_at": "2026-08-14T21:05:00+09:00",
+        "collected_at": "2026-08-17T08:12:55+09:00",
+        "metrics": {
+          "points": 512,
+          "comments": 187,
+          "upvotes": null
+        },
+        "description": "",
+        "query": "hn_front_page",
+        "extra": {
+          "hn_author": "pseudolus",
+          "hn_item_url": "https://news.ycombinator.com/item?id=41261882",
+          "created_at_i": 1786795500,
+          "normalized_url": "https://agilityrobotics.com/blog/digit-gxo-multi-shift",
+          "anchor_url": "https://www.agilityrobotics.com/blog/digit-gxo-multi-shift/",
+          "enrich_status": "success",
+          "enrich_url": "https://www.agilityrobotics.com/blog/digit-gxo-multi-shift/",
+          "enrich_text": "Agility Robotics said Digit units at GXO's Atlanta site have moved from a single supervised shift to two full shifts a day, running 16 hours with a 40-minute battery swap window between them. Twelve robots now handle tote induction and container unloading on the same line as human associates. GXO said uptime across the last eight weeks averaged 92 percent, up from 71 percent during the 2025 pilot, and it has extended the contract through 2028 with an option to add two more sites."
+        }
+      },
+      "rank": 1,
+      "display_title": "Agility's Digit starts multi-shift work at a GXO warehouse",
+      "sort_score": 0.6318,
+      "evidence": {
+        "origin": "overseas",
+        "cluster_size": null,
+        "cluster_article_ids": [],
+        "cluster_publishers": [],
+        "representative_reason": null,
+        "normalized_score": 0.6318,
+        "score_components": {
+          "hacker_news": 0.6318
+        },
+        "merged_article_ids": [
+          "hn:41261882"
+        ]
+      }
+    },
+    "summary_input": {
+      "source": "enrich_text",
+      "text": "Agility Robotics said Digit units at GXO's Atlanta site have moved from a single supervised shift to two full shifts a day, running 16 hours with a 40-minute battery swap window between them. Twelve robots now handle tote induction and container unloading on the same line as human associates. GXO said uptime across the last eight weeks averaged 92 percent, up from 71 percent during the 2025 pilot, and it has extended the contract through 2028 with an option to add two more sites.",
+      "resolved_by": "enrich_text 있음 → 1순위 채택 (SPEC 6.5절 우선순위)",
+      "prompt_variant": "overseas",
+      "conditional_title_only_rule": false,
+      "appended_instruction": null
+    }
+  },
+  "expected": {
+    "brief_item": {
+      "rank": 1,
+      "origin": "overseas",
+      "title": "Agility's Digit starts multi-shift work at a GXO warehouse",
+      "url": "https://www.agilityrobotics.com/blog/digit-gxo-multi-shift/",
+      "summary_lines": [
+        "12대가 하루 16시간 두 교대로 토트 운반을 맡는다.",
+        "파일럿을 넘어 상시 운영으로 넘어간 첫 사례다."
+      ],
+      "publisher": "Agility Robotics",
+      "published_at": "2026-08-14T21:05:00+09:00",
+      "summary_status": "gemini",
+      "source_article_id": "hn:41261882"
+    },
+    "rendered": "**1. Agility's Digit starts multi-shift work at a GXO warehouse**\n    12대가 하루 16시간 두 교대로 토트 운반을 맡는다.\n    파일럿을 넘어 상시 운영으로 넘어간 첫 사례다.\n    Agility Robotics · 08/14",
+    "assertions": [
+      "문장 1의 사실(12대 · 16시간 · 두 교대)은 전부 enrich_text 안에 있다 — 지어낸 값이 없다",
+      "문장 1은 제목이 말하지 않은 내용이다 (제목은 '멀티 시프트 시작'까지만 말한다)",
+      "문장 2는 맥락이다 — 7절 '문장 2 = 왜 중요한지 또는 맥락'",
+      "url 은 anchor_url — `utm_*` 두 개만 지워졌고 `www.` 와 후행 슬래시는 남았다",
+      "enrich_url == anchor_url — 보강은 앵커와 같은 URL을 fetch한다 (SPEC 6.5절)"
+    ]
+  }
+}

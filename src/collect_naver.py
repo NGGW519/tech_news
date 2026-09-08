@@ -28,7 +28,9 @@ from src.text import clean_html
 NAVER_NEWS_URL = "https://naverapihub.apigw.ntruss.com/search/v1/news"
 HEADER_CLIENT_ID = "X-NCP-APIGW-API-KEY-ID"      # 구 X-Naver-Client-Id
 HEADER_CLIENT_SECRET = "X-NCP-APIGW-API-KEY"     # 구 X-Naver-Client-Secret
-DEFAULT_QUERIES: tuple[str, ...] = ("피지컬 AI", "휴머노이드", "자율주행", "로봇", "ROS")  # SPEC 6절, 운영하며 조정
+#: SPEC 6절, 운영하며 조정. "ROS" 는 뺐다 — 라그나로크 온라인 e스포츠(ROS 2026)가 상위에 올라왔고(실측 2026-09-08),
+#: 로봇 운영체제 기사는 "로봇" 키워드가 이미 덮는다.
+DEFAULT_QUERIES: tuple[str, ...] = ("피지컬 AI", "휴머노이드", "자율주행", "로봇")
 DISPLAY = 100        # 호출당 상한
 MAX_START = 1000     # API 의 start 상한 (SPEC 11절 확인 대상). 닿으면 그 키워드는 거기서 멈춘다
 HTTP_TIMEOUT = 10

@@ -133,7 +133,8 @@ def test_fetch_stops_at_window_start_and_skips_items_after_window_end():
     assert [c["params"]["start"] for c in fake.calls] == ["1", "101"]   # 2페이지에서 창 앞 항목을 만나 종료
     assert fake.calls[0]["params"] == {"query": "로봇", "sort": "date", "display": str(DISPLAY), "start": "1"}
     assert fake.calls[0]["url"] == NAVER_NEWS_URL
-    assert fake.calls[0]["headers"] == {"X-Naver-Client-Id": "id", "X-Naver-Client-Secret": "secret"}
+    assert fake.calls[0]["headers"] == {"X-NCP-APIGW-API-KEY-ID": "id", "X-NCP-APIGW-API-KEY": "secret"}   # API HUB 헤더
+    assert NAVER_NEWS_URL == "https://naverapihub.apigw.ntruss.com/search/v1/news"
 
 
 def test_fetch_stops_on_short_last_page():

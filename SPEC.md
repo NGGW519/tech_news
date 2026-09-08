@@ -667,7 +667,7 @@ arXiv·NVIDIA·DeepMind 블로그는 인기도 신호가 없어 애초에 경쟁
 
 ### 국내 — 인기도 API 없음, 커버리지로 대체
 
-- 네이버 검색 API (news)
+- 네이버 검색 API (news) — **NAVER API HUB(NAVER Cloud Platform) 경유** (아래)
 - 키워드: 피지컬 AI, 휴머노이드, 자율주행, 로봇, ROS 등 *(운영하며 조정)*
 - **같은 사건을 몇 개 매체가 보도했는지**를 이슈 강도의 프록시로 사용
 - 클러스터링: 제목 **문자 bigram 자카드 유사도 ≥ 임계값** → 동일 사건 (아래)
@@ -676,6 +676,22 @@ arXiv·NVIDIA·DeepMind 블로그는 인기도 신호가 없어 애초에 경쟁
 > 클러스터링은 중복 제거를 위해 어차피 필요한 작업이며, 랭킹까지 동시에 해결된다.
 
 #### 수집 호출 파라미터
+
+**엔드포인트는 NAVER API HUB 다** (v1.5 확정, 공지 2026-06-29 · 이관 가이드 2026-09-08 확인).
+개발자센터(`openapi.naver.com`)의 검색 API 는 2026-07-31 부터 **신규 신청이 막혔고** 2027-06-30 에 지원이 끝난다.
+이 프로젝트는 그 뒤에 시작했으므로 처음부터 API HUB 만 쓴다. 응답 JSON 형식은 개발자센터와 같아서
+파서·fixture 는 그대로다.
+
+| 항목 | 값 |
+|---|---|
+| URL | `https://naverapihub.apigw.ntruss.com/search/v1/news` |
+| 인증 헤더 | `X-NCP-APIGW-API-KEY-ID: <Client ID>` · `X-NCP-APIGW-API-KEY: <Client Secret>` |
+| 키 발급 | NCP 콘솔 › Services › Application Services › **NAVER API HUB › Application** › 앱 선택 › **[인증 정보]** → Client ID / Client Secret. Application 의 API 에 **검색** 이 선택돼 있어야 한다 |
+| 한도 | 공식 API 문서: 검색 API **일 25,000건**. 이관 안내: 검색 합산 월 775,000건 · 키당 50 RPS. 초과 시 429. 현재 무료(유료 요금제 예정) |
+| 파라미터·응답 | 개발자센터와 동일 — `display` 1~100, `start` 1~1000, `sort` `sim`/`date`, 오류 `SE01~SE06`·`SE99` (2026-09-08 공식 문서 확인) |
+
+시크릿 이름은 `NAVER_CLIENT_ID` / `NAVER_CLIENT_SECRET` 그대로 두되 **값은 API HUB 것**이다 (12절).
+개발자센터 키를 넣으면 `401 errorCode 024` 가 난다.
 
 | 파라미터 | 값 |
 |---|---|
@@ -1203,7 +1219,7 @@ if exists:
 | Notion API | 무료 |
 | 카카오 나에게 보내기 | 무료 |
 | Hacker News / Reddit | 무료 |
-| 네이버 검색 API | 무료 (일 25,000회 한도, 실사용 수 회) |
+| 네이버 검색 API (API HUB) | 무료 (일 25,000건 한도, 실사용 주 수십 회). 유료 요금제 예정 — 도입 시 재확인 |
 | Gemini API | 월 수십~수백 원 |
 
 ---
@@ -1219,6 +1235,7 @@ if exists:
 - Gemini 현재 유효 모델 ID, 그리고 **JSON 응답 강제 옵션**의 현재 이름 (7절 응답 스키마)
   — **2026-09-08 확인 완료**, 7절 "모델 ID" 에 기록. 구현 시점이 이보다 한 달 이상 뒤면 같은 절차로 재확인
 - 네이버 검색 API의 파라미터 및 페이지네이션 상한 (`start` 최대값 — 6절)
+  — **2026-09-08 확인**: 엔드포인트가 NAVER API HUB 로 이관됨. 개발자센터 키·URL 은 쓰지 않는다 (6절)
 - Reddit `top?t=week` JSON 엔드포인트의 인증 요구 여부 (User-Agent 정책 포함)
   — **2026-09-08 확인**: 비인증은 데이터센터 IP 에서 403. OAuth client_credentials 로 확정 (6절)
 - arXiv export API 는 응답이 10초를 넘기기도 하고 연속 요청에 429 를 낸다 — 타임아웃 30초, 요청 간 3초 (6절)
@@ -1231,7 +1248,7 @@ if exists:
 
 | Secret | 용도 |
 |---|---|
-| `NAVER_CLIENT_ID` / `NAVER_CLIENT_SECRET` | 국내 뉴스 수집 |
+| `NAVER_CLIENT_ID` / `NAVER_CLIENT_SECRET` | 국내 뉴스 수집 — **NAVER API HUB 의 Client ID / Client Secret** (개발자센터 키 아님, 6절) |
 | `GEMINI_API_KEY` | 요약 |
 | `NOTION_TOKEN` | Notion 쓰기 (Internal Integration, 만료 없음) |
 | `NOTION_ROOT_PAGE_ID` | 루트 페이지 |

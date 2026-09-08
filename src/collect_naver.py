@@ -1,4 +1,4 @@
-"""국내 수집 — 네이버 검색 API (news) (SPEC 6절 "국내").
+"""국내 수집 — 네이버 검색 API (news), NAVER API HUB 경유 (SPEC 6절 "국내").
 
 네트워크 호출부와 순수 로직을 나눈다 (SPEC 3절 유의점 4).
 
@@ -23,7 +23,11 @@ from src.publishers import publisher_name
 from src.schema import Origin, RawArticle, RawMetrics, SourceKind, WeekMeta, ensure_kst, now_kst
 from src.text import clean_html
 
-NAVER_NEWS_URL = "https://openapi.naver.com/v1/search/news.json"
+#: NAVER API HUB (NAVER Cloud Platform). 개발자센터(openapi.naver.com)의 검색 API 는 2026-07-31 부터 신규 신청이
+#: 막혔고 2027-06-30 지원 종료라 처음부터 API HUB 를 쓴다. 응답 JSON 형식은 개발자센터와 같다 (이관 가이드, 2026-09-08 확인).
+NAVER_NEWS_URL = "https://naverapihub.apigw.ntruss.com/search/v1/news"
+HEADER_CLIENT_ID = "X-NCP-APIGW-API-KEY-ID"      # 구 X-Naver-Client-Id
+HEADER_CLIENT_SECRET = "X-NCP-APIGW-API-KEY"     # 구 X-Naver-Client-Secret
 DEFAULT_QUERIES: tuple[str, ...] = ("피지컬 AI", "휴머노이드", "자율주행", "로봇", "ROS")  # SPEC 6절, 운영하며 조정
 DISPLAY = 100        # 호출당 상한
 MAX_START = 1000     # API 의 start 상한 (SPEC 11절 확인 대상). 닿으면 그 키워드는 거기서 멈춘다
@@ -94,14 +98,20 @@ def merge_across_queries(articles: Iterable[RawArticle]) -> list[RawArticle]:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-# 네이버 오류 코드(문서 기준) → 사람이 할 일. 응답 본문의 errorCode 로 판별한다
+# 응답 본문의 errorCode / HTTP 상태 → 사람이 할 일
 _NAVER_HINTS = {
-    "024": "인증 실패 — NAVER_CLIENT_ID / NAVER_CLIENT_SECRET 이 틀렸거나, 네이버 앱의 [사용 API] 에 '검색' 이 추가되지 않았다",
-    "SE05": "존재하지 않는 검색 API — 앱의 [사용 API] 에 '검색' 을 추가해야 한다",
-    "SE03": "start 값 범위 초과 (1~1000)",
-    "SE02": "display 값 범위 초과 (1~100)",
-    "SE06": "인코딩 오류 — query 는 UTF-8 URL 인코딩",
-    "012": "API 호출 한도 초과 (일 25,000회)",
+    '"024"': "인증 실패 — NAVER_CLIENT_ID / NAVER_CLIENT_SECRET 이 API HUB 의 Client ID / Client Secret 인지, "
+             "Application 에 '검색' API 가 선택돼 있는지 확인 (개발자센터 키는 이 엔드포인트에서 안 통한다)",
+    '"200"': "인증 헤더 누락/오류 (API Gateway) — 헤더 이름은 X-NCP-APIGW-API-KEY-ID / X-NCP-APIGW-API-KEY",
+    '"210"': "API Gateway: 허용되지 않은 키 — Application 에 이 API 가 포함돼 있지 않다",
+    '"SE05"': "존재하지 않는 검색 API — Application 의 API 목록에 '검색' 을 추가",
+    '"SE03"': "start 값 범위 초과 (1~1000)",
+    '"SE02"': "display 값 범위 초과 (1~100)",
+}
+_STATUS_HINTS = {
+    401: "인증 실패 — 키가 API HUB 것인지 확인 (Application > Client ID / Client Secret)",
+    403: "권한 없음 — Application 에 '검색' API 가 선택돼 있지 않거나 승인 전",
+    429: "호출 한도 초과 — API HUB 검색 API 는 월 775,000건 · 50 RPS",
 }
 
 
@@ -109,8 +119,8 @@ def urllib_get(url: str, params: dict[str, str], headers: dict[str, str]) -> dic
     try:
         return http.get_json(url, params, headers, HTTP_TIMEOUT)
     except http.HttpError as e:
-        hint = next((h for code, h in _NAVER_HINTS.items() if f'"{code}"' in e.body), "")
-        raise RuntimeError(f"네이버 API HTTP {e.status}: {e.body[:200]}" + (f"\n→ {hint}" if hint else "")) from None
+        hint = next((h for code, h in _NAVER_HINTS.items() if code in e.body), _STATUS_HINTS.get(e.status, ""))
+        raise RuntimeError(f"네이버 API HUB HTTP {e.status}: {e.body[:200]}" + (f"\n→ {hint}" if hint else "")) from None
 
 
 def fetch_query(
@@ -128,7 +138,7 @@ def fetch_query(
       - 창 뒤쪽(실행일 이후) 항목은 버리고 계속 본다
       - 창 앞쪽(window_start 이전) 항목을 만나면 그 키워드는 끝
     """
-    headers = {"X-Naver-Client-Id": client_id, "X-Naver-Client-Secret": client_secret}
+    headers = {HEADER_CLIENT_ID: client_id, HEADER_CLIENT_SECRET: client_secret}
     stamp = collected_at or now_kst()
     kept: list[RawArticle] = []
     start = 1

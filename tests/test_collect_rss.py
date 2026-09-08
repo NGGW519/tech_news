@@ -6,6 +6,8 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+import pytest
+
 from src.collect_rss import DEFAULT_FEEDS, Feed, collect_rss, fetch_feed, parse_feed, slug_for
 from src.schema import KST
 from src.week import compute_week
@@ -65,6 +67,33 @@ def test_fetch_filters_window_and_passes_params():
                       collected_at=COLLECTED)
     assert calls[-1] == (ARXIV_RO.url, {"sortBy": "submittedDate"})
     assert calls[0] == (DEEPMIND.url, None)
+
+
+def test_429_is_retried_once_after_waiting():
+    from src.http import HttpError
+    attempts, slept = [], []
+
+    def flaky(url, params=None):
+        attempts.append(url)
+        if len(attempts) == 1:
+            raise HttpError(429, url, "Rate exceeded.")
+        return _xml("api_rss_arxiv_cs_ro.xml")
+
+    got = fetch_feed(ARXIV_RO, WEEK, get_text=flaky, collected_at=COLLECTED, sleep=slept.append)
+    assert len(got) == 1 and len(attempts) == 2 and slept == [15]
+
+
+def test_non_429_error_is_not_retried():
+    from src.http import HttpError
+    attempts = []
+
+    def dead(url, params=None):
+        attempts.append(url)
+        raise HttpError(500, url, "boom")
+
+    with pytest.raises(HttpError):
+        fetch_feed(ARXIV_RO, WEEK, get_text=dead, collected_at=COLLECTED, sleep=lambda s: None)
+    assert len(attempts) == 1
 
 
 def test_one_dead_feed_does_not_block_the_others(caplog):

@@ -32,6 +32,7 @@ log = logging.getLogger(__name__)
 
 ATOM_NS = "{http://www.w3.org/2005/Atom}"
 ARXIV_DELAY_SECONDS = 3.0        # arXiv API 이용 약관: 요청 간 3초
+RATE_LIMIT_RETRY_SECONDS = 15    # 429 뒤 재시도 대기 (1회)
 FEED_TIMEOUT = 30                # arXiv export API 는 10초를 넘기기도 한다 (실측 2026-09-08)
 _ARXIV_VERSION = re.compile(r"v\d+$")
 
@@ -46,7 +47,7 @@ class Feed:
     params: dict[str, str] = field(default_factory=dict)   # 요청에만 붙는 파라미터
 
 
-_ARXIV_PARAMS = {"sortBy": "submittedDate", "sortOrder": "descending", "max_results": "200"}
+_ARXIV_PARAMS = {"sortBy": "submittedDate", "sortOrder": "descending", "max_results": "100"}   # 200 은 응답이 느려 타임아웃이 잦다
 
 DEFAULT_FEEDS: tuple[Feed, ...] = (
     Feed("arxiv", "http://export.arxiv.org/api/query?search_query=cat:cs.RO", _ARXIV_PARAMS),
@@ -153,8 +154,16 @@ def dedupe(articles: Iterable[RawArticle]) -> list[RawArticle]:
 
 
 def fetch_feed(feed: Feed, week: WeekMeta, *, get_text: GetText = get_text,
-               collected_at: datetime | None = None) -> list[RawArticle]:
-    xml_text = get_text(feed.url, feed.params or None)
+               collected_at: datetime | None = None, sleep: Callable[[float], None] = time.sleep) -> list[RawArticle]:
+    """피드 1개. 429(Rate exceeded) 면 한 번만 더 기다렸다 재시도한다 — arXiv 가 그렇다 (실측 2026-09-08)."""
+    try:
+        xml_text = get_text(feed.url, feed.params or None)
+    except http.HttpError as e:
+        if e.status != 429:
+            raise
+        log.warning("rss %s 429 — %ds 뒤 1회 재시도", feed.key, RATE_LIMIT_RETRY_SECONDS)
+        sleep(RATE_LIMIT_RETRY_SECONDS)
+        xml_text = get_text(feed.url, feed.params or None)
     stamp = collected_at or now_kst()
     return [a for a in parse_feed(xml_text, feed, stamp) if week.contains(a.published_at)]
 
@@ -170,7 +179,7 @@ def collect_rss(week: WeekMeta, *, feeds: Iterable[Feed] = DEFAULT_FEEDS, get_te
             sleep(ARXIV_DELAY_SECONDS)
         previous_key = feed.key
         try:
-            got = fetch_feed(feed, week, get_text=get_text, collected_at=stamp)
+            got = fetch_feed(feed, week, get_text=get_text, collected_at=stamp, sleep=sleep)
         except Exception as e:  # noqa: BLE001 — 예비 풀 피드 하나 때문에 해외 수집을 잃지 않는다
             log.warning("rss %s 실패 — 건너뜀 (%s): %s", feed.key, feed.url, e)
             continue

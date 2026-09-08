@@ -13,14 +13,12 @@ HTML 태그·엔티티 제거는 여기서 즉시 수행한다 — RawArticle.ti
 from __future__ import annotations
 
 import hashlib
-import json
-import urllib.parse
-import urllib.request
 from collections.abc import Callable, Iterable
 from datetime import datetime
 from email.utils import parsedate_to_datetime
 from typing import Any
 
+from src import http
 from src.publishers import publisher_name
 from src.schema import Origin, RawArticle, RawMetrics, SourceKind, WeekMeta, ensure_kst, now_kst
 from src.text import clean_html
@@ -96,10 +94,23 @@ def merge_across_queries(articles: Iterable[RawArticle]) -> list[RawArticle]:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
+# 네이버 오류 코드(문서 기준) → 사람이 할 일. 응답 본문의 errorCode 로 판별한다
+_NAVER_HINTS = {
+    "024": "인증 실패 — NAVER_CLIENT_ID / NAVER_CLIENT_SECRET 이 틀렸거나, 네이버 앱의 [사용 API] 에 '검색' 이 추가되지 않았다",
+    "SE05": "존재하지 않는 검색 API — 앱의 [사용 API] 에 '검색' 을 추가해야 한다",
+    "SE03": "start 값 범위 초과 (1~1000)",
+    "SE02": "display 값 범위 초과 (1~100)",
+    "SE06": "인코딩 오류 — query 는 UTF-8 URL 인코딩",
+    "012": "API 호출 한도 초과 (일 25,000회)",
+}
+
+
 def urllib_get(url: str, params: dict[str, str], headers: dict[str, str]) -> dict[str, Any]:
-    req = urllib.request.Request(url + "?" + urllib.parse.urlencode(params), headers=headers)
-    with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    try:
+        return http.get_json(url, params, headers, HTTP_TIMEOUT)
+    except http.HttpError as e:
+        hint = next((h for code, h in _NAVER_HINTS.items() if f'"{code}"' in e.body), "")
+        raise RuntimeError(f"네이버 API HTTP {e.status}: {e.body[:200]}" + (f"\n→ {hint}" if hint else "")) from None
 
 
 def fetch_query(

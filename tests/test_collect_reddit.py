@@ -93,13 +93,9 @@ def test_app_token_failure_raises():
         get_app_token("c", "s", post_form=lambda u, f, h=None: {"error": "invalid_grant"})
 
 
-def test_without_credentials_falls_back_to_public_json(caplog):
-    seen = []
+def test_without_credentials_skips_cleanly_without_any_call(caplog):
+    def must_not_call(*a, **k):
+        raise AssertionError("자격 증명 없으면 호출하면 안 된다")
 
-    def fake(url, params, headers=None):
-        seen.append(url)
-        return {"data": {"children": []}}
-
-    assert collect_reddit(WEEK, get_json=fake, collected_at=COLLECTED) == []
-    assert seen == ["https://www.reddit.com/r/robotics/top.json", "https://www.reddit.com/r/MachineLearning/top.json"]
-    assert "자격 증명" in caplog.text
+    assert collect_reddit(WEEK, get_json=must_not_call, post_form=must_not_call, collected_at=COLLECTED) == []
+    assert "건너뛴다" in caplog.text

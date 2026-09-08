@@ -532,8 +532,10 @@ fixture 의 `publisher` 값이 표에서 재현되지 않으면 그것은 표의
 
 **Reddit 은 비인증 JSON 이 막힌다.** `www.reddit.com/r/<sub>/top.json` · `api.reddit.com` · `old.reddit.com` 전부
 데이터센터 IP 에서 403 (실측 2026-09-08, Actions 런너도 같은 처지). Reddit "script" 앱을 만들어
-`REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` 을 Secrets 에 넣는다 (12절). 자격 증명이 없으면 비인증 경로를
-시도하고 경고를 남긴다 — 집 IP 에서 로컬 실행할 때는 통한다.
+`REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` 을 Secrets 에 넣는다 (12절).
+**자격 증명이 없으면 Reddit 은 건너뛴다 — 0건이며 실패가 아니다.** 비인증 호출을 시도해 봐야 매주 실패로
+기록될 뿐이므로 시도하지 않는다. Reddit 은 선택 소스이고, 없으면 HN + 예비 풀로 5건을 채운다.
+단, Reddit 이 빠지면 "두 플랫폼에 다 오른 글" 의 합산 신호(위 3단계)가 사라진다는 점은 감수한다.
 
 **해외 소스는 서로 독립이다.** Reddit 이 403 이어도 HN·RSS 는 발행되고, RSS 피드 하나가 죽어도 나머지 피드는
 수집된다. 실패한 소스는 로그와 종료 코드(1)로 드러낸다 — 2절 부분 발행 원칙의 해외판이다.

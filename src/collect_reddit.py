@@ -102,11 +102,12 @@ def collect_reddit(week: WeekMeta, *, subreddits: Iterable[str] = DEFAULT_SUBRED
                    get_json: GetJson = http.get_json, post_form: PostForm = http.post_form,
                    collected_at: datetime | None = None,
                    client_id: str | None = None, client_secret: str | None = None) -> list[RawArticle]:
+    """자격 증명이 없으면 **건너뛴다** (0건, 실패 아님). 비인증 호출은 데이터센터 IP 에서 항상 403 이라
+    시도해 봐야 매주 Actions 를 빨갛게 만들 뿐이다. Reddit 은 선택 소스다 (SPEC 6절)."""
+    if not (client_id and client_secret):
+        log.warning("Reddit 자격 증명(REDDIT_CLIENT_ID/SECRET) 없음 — Reddit 수집을 건너뛴다 (HN·RSS 만으로 발행)")
+        return []
     stamp = collected_at or now_kst()
-    token = None
-    if client_id and client_secret:
-        token = get_app_token(client_id, client_secret, post_form=post_form)
-    else:
-        log.warning("Reddit 자격 증명(REDDIT_CLIENT_ID/SECRET) 없음 — 비인증 JSON 을 시도한다. 데이터센터 IP 에서는 403 이 난다")
+    token = get_app_token(client_id, client_secret, post_form=post_form)
     return [a for sub in subreddits
             for a in fetch_subreddit(sub, week, get_json=get_json, collected_at=stamp, access_token=token)]

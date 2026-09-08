@@ -1,0 +1,8 @@
+run_at: 2026-09-08T13:56:33+09:00
+week: 9월 1주 (08/31~09/06)
+domestic: 5
+overseas: 5
+summary: gemini 10 / fallback 0
+status: already_exists
+notion: -
+failures: -

@@ -228,6 +228,16 @@ permissions:
 
 수집 원본 URL은 어느 쪽에도 덮이지 않고 `RawArticle.url` 에 그대로 남는다.
 
+**트래킹 파라미터 집합** (두 정규화가 공유한다. v1.5 확정, 운영하며 추가):
+
+| 종류 | 값 |
+|---|---|
+| 접두 일치 | `utm_` 로 시작하는 모든 키 |
+| 정확 일치 | `fbclid`, `gclid`, `ref`, `source` |
+
+이 목록에 없는 쿼리 파라미터는 **모두 보존**한다. `?no=20260814082011` 같은 기사 식별자를
+지우면 다른 기사로 가거나 404 가 되기 때문이다. 파라미터가 하나도 안 남으면 `?` 도 뗀다.
+
 **규칙을 나눈 이유**: 비교용 정규화는 파괴적이다. `www.` 를 지운 호스트가 응답하지
 않으면 링크 자체가 깨진다. 비교는 문자열이 같기만 하면 되므로 파괴적이어도 되지만,
 앵커는 사람이 실제로 클릭한다. **깨진 링크가 `utm` 파라미터보다 나쁘다.**
@@ -471,6 +481,7 @@ fixture 의 `publisher` 값이 표에서 재현되지 않으면 그것은 표의
 | `mt.co.kr` | 머니투데이 | | `arxiv.org` | arXiv *(1의 특례와 같은 값)* |
 | `zdnet.co.kr` | ZDNet Korea | | `reddit.com` | Reddit *(self-post 는 1의 특례가 우선)* |
 | `fnnews.com` | 파이낸셜뉴스 | | `redd.it` | Reddit *(`i.redd.it`·`v.redd.it` 미디어 링크 글)* |
+| | | | `ycombinator.com` | Hacker News *(Ask HN 등 외부 링크가 없는 글)* |
 
 > 등록 도메인 판정에 `co.kr` 류 2단 접미사가 필요하다.
 > `news.mt.co.kr` 의 등록 도메인은 `mt.co.kr` 이지 `co.kr` 이 아니다.
@@ -520,6 +531,21 @@ fixture 의 `publisher` 값이 표에서 재현되지 않으면 그것은 표의
   창 첫날(월요일 새벽)이 빠지고 실행 당일 새벽이 섞여 들어온다.
   `created_utc` 를 KST로 변환해 창 밖 항목을 버린다.
 - HN `created_at_i`, Reddit `created_utc` 는 **epoch(UTC)** 다. KST 변환은 수집기 책임이다.
+
+**보조 RSS 피드 목록** (v1.5 확정, 운영하며 조정). `<피드키>` 는 `article_id` 규약의 일부라 바꾸지 않는다.
+
+| 피드키 | URL | 형식 | `<슬러그>` |
+|---|---|---|---|
+| `arxiv` | `http://export.arxiv.org/api/query?search_query=cat:cs.RO` · 같은 형식의 `cat:cs.AI` (요청 시 `sortBy=submittedDate&sortOrder=descending&max_results=200` 추가) | Atom | 논문 ID, 버전 제거 (`2608.05119v1` → `2608.05119`) |
+| `deepmind` | `https://deepmind.google/blog/rss.xml` | RSS 2.0 | URL 마지막 경로 조각 |
+| `nvidia` | `https://blogs.nvidia.com/feed/` | RSS 2.0 | URL 마지막 경로 조각 |
+
+- arXiv 두 카테고리는 같은 피드키 `arxiv` 를 쓴다. 논문 ID 가 슬러그라 카테고리가 달라도 `article_id` 가 같고,
+  cs.RO·cs.AI 에 교차 등재된 논문은 자연히 1건이 된다.
+- 피드 URL 은 11절 확인 대상이다 (사이트가 경로를 바꾸면 조용히 0건이 된다 → 로그에 피드별 건수를 남긴다).
+- arXiv API 는 요청 간 **3초** 간격을 요구한다. cs.RO → cs.AI 사이에 대기한다.
+- `extra.feed_url` 에는 위 표의 URL 을 그대로 남긴다 (요청 시 덧붙인 파라미터는 제외). fixture 와 같다.
+- Atom 의 `guid` 는 `<id>` 가 아니라 **alternate 링크** 다 (arXiv `<id>` 에는 `v1` 이 붙어 있어 버전마다 달라진다).
 
 #### 점수 산출 — 3단계
 
@@ -786,6 +812,16 @@ fixture 는 이 값에 맞춰 고치지 않는다 — 임계값이 fixture 를 �
 | 타임아웃 | **5초** |
 | 재시도 | **없음** |
 | 실패 시 | **원상태 유지** — 요약 입력은 기존 `description` 그대로 |
+| 추출기 | **`trafilatura`** (v1.5 확정). `extract(html, include_comments=False, include_tables=False)` |
+| 실패 판정 | HTTP 오류·타임아웃·추출 결과 `None`·**추출 텍스트 200자 미만** → `failed` |
+| 요청 헤더 | 식별 가능한 `User-Agent` (`tech-news-brief/1.0 (+repo URL)`) |
+
+**`trafilatura` 인 이유**: 본문/잡음 분리를 직접 짜지 않는다. 순수 파이썬 계열 의존성만 끌고 오며
+(lxml 포함), Actions 설치 시간이 수십 초 안이다. 형태소 분석기를 뺀 이유(무거운 네이티브 빌드)와 다르다.
+
+**200자 미만을 실패로 보는 이유**: 쿠키 배너·"JavaScript 를 켜 주세요" 류만 긁힌 결과를
+성공으로 넘기면 모델이 그것을 본문으로 알고 요약한다. 그 길이는 fixture 의 최단 성공 사례
+(5위 self-post, 213자)를 근거로 잡았다.
 
 ### 왜 필요한가
 
@@ -1087,6 +1123,19 @@ refresh token 은 콘솔에서 복사하는 값이 아니라 **사용자 로그�
 카카오 문서 확인(2026-09-08): access token 12시간, refresh token 60일. 텍스트 템플릿 `text` 는
 **최대 200자**, 화면에는 **2줄까지만 표시**되고 그 뒤는 줄임표다 — 위 본문이 2줄 + 버튼인 이유다.
 
+**재발급된 refresh token 의 보관 — Actions 의 구조적 제약.** "사실상 무기한 유지" 는 재발급된
+토큰을 **어딘가에 저장해야** 성립한다. Actions 런너는 실행이 끝나면 사라지고, `GITHUB_TOKEN` 은
+repo Secrets 를 쓸 권한이 없다. 그래서:
+
+| 상황 | 동작 |
+|---|---|
+| `GH_PAT` 시크릿(repo secrets 쓰기 권한 PAT)이 있음 | 워크플로우 말미에 `gh secret set KAKAO_REFRESH_TOKEN` 으로 자동 갱신 |
+| 없음 | `::warning::` 만 남는다. 원래 토큰의 60일 만료 전에 `scripts/kakao_refresh_token.py` 로 수동 재발급 |
+
+재발급된 토큰은 코드가 `KAKAO_NEW_REFRESH_TOKEN_FILE` 경로(런너 임시 디렉터리)에 쓰고 워크플로우 스텝이
+읽는다. **저장소 안에는 절대 쓰지 않는다** (12절). 이 파일 경로 방식은 9절이 금지한 "상태 파일"이 아니다 —
+실행 간 상태를 넘기는 것이 아니라 같은 실행 안에서 스텝 사이를 넘길 뿐이다.
+
 ---
 
 ## 9. 안정성 장치
@@ -1171,6 +1220,7 @@ if exists:
 | `NOTION_TOKEN` | Notion 쓰기 (Internal Integration, 만료 없음) |
 | `NOTION_ROOT_PAGE_ID` | 루트 페이지 |
 | `KAKAO_REST_API_KEY` / `KAKAO_REFRESH_TOKEN` | 알림 발송 |
+| `GH_PAT` *(선택)* | repo Secrets 쓰기 권한이 있는 fine-grained PAT. 있으면 카카오 refresh token 재발급 시 자동 갱신 (8절) |
 | `KAKAO_CLIENT_SECRET` | [앱] > [플랫폼 키] > [REST API 키] > [클라이언트 시크릿]. **새 콘솔의 REST API 키는 이 기능이 기본으로 켜져 있다** (2026-09-08 문서 확인) — 없으면 토큰 요청이 `KOE010` 으로 실패한다. 갱신 호출에도 필요하므로 Actions 에도 넣는다. 콘솔에서 명시적으로 껐을 때만 생략 |
 
 `KAKAO_REDIRECT_URI` 는 최초 발급 때 브라우저 리다이렉트용으로만 쓰이므로 로컬 `.env` 에만 두고

@@ -55,6 +55,7 @@ DOMAIN_TO_NAME: dict[str, str] = {
     "arxiv.org": "arXiv",           # 1의 특례와 같은 값. 표에도 두어 조회가 어느 경로든 같게
     "reddit.com": "Reddit",         # self-post 는 1의 특례가 우선. 크로스포스트 등 링크 글용
     "redd.it": "Reddit",            # i.redd.it / v.redd.it 미디어 링크 글
+    "ycombinator.com": "Hacker News",  # Ask HN 등 외부 링크가 없는 글 (news.ycombinator.com)
 }
 
 #: 등록 도메인이 3라벨인 2단 공개 접미사. `news.mt.co.kr` 의 등록 도메인은 `mt.co.kr` 이다.

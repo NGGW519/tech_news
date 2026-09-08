@@ -13,9 +13,7 @@ HTML 태그·엔티티 제거는 여기서 즉시 수행한다 — RawArticle.ti
 from __future__ import annotations
 
 import hashlib
-import html
 import json
-import re
 import urllib.parse
 import urllib.request
 from collections.abc import Callable, Iterable
@@ -25,6 +23,7 @@ from typing import Any
 
 from src.publishers import publisher_name
 from src.schema import Origin, RawArticle, RawMetrics, SourceKind, WeekMeta, ensure_kst, now_kst
+from src.text import clean_html
 
 NAVER_NEWS_URL = "https://openapi.naver.com/v1/search/news.json"
 DEFAULT_QUERIES: tuple[str, ...] = ("피지컬 AI", "휴머노이드", "자율주행", "로봇", "ROS")  # SPEC 6절, 운영하며 조정
@@ -34,17 +33,12 @@ HTTP_TIMEOUT = 10
 
 HttpGet = Callable[[str, dict[str, str], dict[str, str]], dict[str, Any]]
 
-_TAG = re.compile(r"<[^>]+>")
-
-
 # ─────────────────────────────────────────────────────────────────────────────
 # 순수 로직
 # ─────────────────────────────────────────────────────────────────────────────
 
-
-def clean_text(value: str) -> str:
-    """`<b>` 등 태그 제거 → HTML 엔티티 해제 → 양끝 공백 제거. 접두사는 손대지 않는다."""
-    return html.unescape(_TAG.sub("", value)).strip()
+# `<b>` 등 태그 제거 → HTML 엔티티 해제 → 양끝 공백 제거. 접두사는 손대지 않는다 (src/text.py 공용)
+clean_text = clean_html
 
 
 def article_id_for(originallink: str) -> str:

@@ -1,0 +1,68 @@
+# 주간 테크 뉴스 브리핑 (SPEC 2절 실행 사양)
+name: weekly-brief
+
+on:
+  schedule:
+    - cron: '10 23 * * 0'   # UTC 일 23:10 = KST 월 08:10 (지연 감안해 20분 당김)
+  workflow_dispatch:         # 수동 실행 · 실패한 주 복구용 (비월요일 실행은 그 주 월요일로 스냅된다)
+
+permissions:
+  contents: write            # 실행 로그 커밋 (SPEC 9절 60일 비활성화 대응)
+
+concurrency:
+  group: weekly-brief
+  cancel-in-progress: false
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Run weekly brief
+        id: run
+        env:
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_ROOT_PAGE_ID: ${{ secrets.NOTION_ROOT_PAGE_ID }}
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          KAKAO_NEW_REFRESH_TOKEN_FILE: ${{ runner.temp }}/kakao_refresh_token
+        run: python -m src.main
+
+      # 카카오가 새 refresh token 을 돌려준 경우(잔여 1개월 미만) Secrets 를 갱신한다.
+      # GITHUB_TOKEN 은 Secrets 를 쓸 수 없으므로 repo secrets 권한이 있는 PAT(GH_PAT)가 있을 때만 동작한다.
+      # 없으면 경고만 남고, 만료 전에 scripts/kakao_refresh_token.py 로 수동 재발급해야 한다.
+      - name: Rotate Kakao refresh token
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          TOKEN_FILE: ${{ runner.temp }}/kakao_refresh_token
+        run: |
+          if [ ! -s "$TOKEN_FILE" ]; then exit 0; fi
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::카카오 refresh token 이 재발급됐지만 GH_PAT 이 없어 Secrets 를 갱신하지 못했다. 만료 전 수동 재발급 필요"
+            exit 0
+          fi
+          gh secret set KAKAO_REFRESH_TOKEN --repo "$GITHUB_REPOSITORY" < "$TOKEN_FILE"
+          echo "KAKAO_REFRESH_TOKEN secret updated"
+
+      - name: Commit run log
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add logs/last_run.txt || true
+          git commit -m "run log: $(date -u +%Y-%m-%d)" || echo "no log changes"
+          git push

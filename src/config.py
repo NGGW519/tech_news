@@ -37,8 +37,6 @@ class Settings:
     kakao_rest_api_key: str
     kakao_refresh_token: str
     kakao_client_secret: str | None = None     # 클라이언트 시크릿을 켠 앱만
-    reddit_client_id: str | None = None        # Reddit script 앱. 없으면 비인증 시도 (Actions 에서는 403)
-    reddit_client_secret: str | None = None
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -54,6 +52,4 @@ class Settings:
             kakao_rest_api_key=os.environ["KAKAO_REST_API_KEY"],
             kakao_refresh_token=os.environ["KAKAO_REFRESH_TOKEN"],
             kakao_client_secret=os.environ.get("KAKAO_CLIENT_SECRET") or None,
-            reddit_client_id=os.environ.get("REDDIT_CLIENT_ID") or None,
-            reddit_client_secret=os.environ.get("REDDIT_CLIENT_SECRET") or None,
         )

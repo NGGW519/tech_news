@@ -27,7 +27,6 @@ from pathlib import Path
 from src import kakao
 from src.collect_hn import collect_hn
 from src.collect_naver import collect_domestic
-from src.collect_reddit import collect_reddit
 from src.collect_rss import collect_rss
 from src.config import PROJECT_ROOT, Settings, load_dotenv
 from src.enrich import enrich_ranked
@@ -96,8 +95,6 @@ def build_services(settings: Settings, *, no_llm: bool = False) -> Services:
             week, client_id=settings.naver_client_id, client_secret=settings.naver_client_secret),
         overseas_collectors={
             "hn": collect_hn,
-            "reddit": lambda week: collect_reddit(
-                week, client_id=settings.reddit_client_id, client_secret=settings.reddit_client_secret),
             "rss": collect_rss,
         },
         enrich=enrich_ranked,

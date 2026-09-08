@@ -10,6 +10,8 @@
 > 첫 구현 파일이며, 1.4의 "이번 세션 파일 생성 금지"는 그 세션에 한한 것이었다.
 > **Gemini 모델 ID `gemini-3.8-flash` 확정**과 JSON 강제 옵션 이름을 실조회·공식 문서로
 > 확인해 기록(7절 "모델 ID" 신설, 11절).
+> **Reddit 소스 제거**(3·6·10·12절) — Reddit 이 2025-11 부터 Data API 신규 앱을 모더레이션 용도로만
+> 승인해 개인 읽기용 앱을 만들 수 없다. 해외는 **HN + 보조 RSS** 로 간다. 국내 수집은 **NAVER API HUB** 로 전환(6절).
 
 > **1.4 변경**: 구현 착수를 막던 블로커 8건 확정 —
 > `article_id` 규약과 **publisher 도메인 매핑**을 본문으로 승격(6절),
@@ -118,7 +120,7 @@ permissions:
                     ▼                     ▼
          ┌────────────────────┐ ┌────────────────────┐
          │  국내 수집          │ │  해외 수집          │
-         │  네이버 검색 API    │ │  HN · Reddit · RSS │
+         │  네이버 검색 API    │ │  HN · 보조 RSS      │
          └─────────┬──────────┘ └─────────┬──────────┘
                    ▼                      ▼
          ┌──────────────────────────────────────────┐
@@ -151,7 +153,7 @@ permissions:
 
 1. **국내 / 해외는 별개 파이프라인이다.**
    나란히 그려져 있지만 공유 코드가 거의 없다.
-   해외는 HN·Reddit이 점수를 제공하므로 정규화만 하면 되고,
+   해외는 HN이 점수를 제공하므로 정규화만 하면 되고,
    국내는 점수가 없어 클러스터링으로 커버리지를 세야 한다.
    → 두 모듈로 분리하고 **출력 인터페이스만 통일**한다.
 
@@ -511,8 +513,15 @@ fixture 의 `publisher` 값이 표에서 재현되지 않으면 그것은 표의
 | 소스 | 신호 | 비고 |
 |---|---|---|
 | Hacker News (Algolia API) | points, num_comments | 인증 불필요, 기간 필터 지원 |
-| Reddit r/robotics, r/MachineLearning | upvotes | `top?t=week` JSON |
 | arXiv (cs.RO, cs.AI), NVIDIA/DeepMind 블로그 | — | 보조 RSS |
+| ~~Reddit r/robotics, r/MachineLearning~~ | ~~upvotes~~ | **v1.5 제거** — 아래 "Reddit 을 뺀 이유" |
+
+**Reddit 을 뺀 이유** (2026-09-08 확인): Reddit 은 2025-11 Responsible Builder Policy 이후 Data API 신규 앱을
+**수동 승인제**로 바꿨고, 공식 안내는 "valid **moderation** use case" 에만 신청하라고 한다. 개인 읽기용 뉴스
+다이제스트는 대상이 아니며, 비인증 JSON 은 데이터센터 IP(Actions 포함)에서 403 이다. 신청해도 응답이 없거나
+거절되는 경우가 보고된다. 그래서 소스에서 뺀다. 잃는 것은 "HN·Reddit 양쪽에 오른 글" 의 합산 신호 하나이고,
+해외 5건은 HN + 예비 풀로 채운다. 스키마의 `SourceKind.REDDIT` 과 fixture 의 Reddit 항목은 그대로 둔다 —
+스키마는 고정점이고, 랭킹 공식은 소스에 무관하게 동작해야 하기 때문이다. 승인이 열리면 수집기만 다시 붙이면 된다.
 
 원시 점수(points, comments, upvotes)는 스키마에 보존한다. 정규화는 랭킹 단계 책임.
 
@@ -521,7 +530,6 @@ fixture 의 `publisher` 값이 표에서 재현되지 않으면 그것은 표의
 | 소스 | 호출 |
 |---|---|
 | Hacker News | Algolia `search_by_date`, `tags=story`, `query=<키워드>`, `restrictSearchableAttributes=title`, `numericFilters=created_at_i>{창 시작},created_at_i<{창 끝}` |
-| Reddit | **OAuth2 client_credentials** (script 앱) → `https://oauth.reddit.com/r/<sub>/top?t=week&limit=100&raw_json=1` |
 | 보조 RSS | 피드 전체를 받아 `pubDate`/`updated` 로 수집 창 필터. 타임아웃 30초 |
 
 **HN 은 키워드로 호출한다** (`robot`, `robotics`, `humanoid`, `physical AI`, `autonomous driving` — 운영하며 조정).
@@ -530,25 +538,12 @@ fixture 의 `publisher` 값이 표에서 재현되지 않으면 그것은 표의
 **제목 키워드 필터**(`robot`·`humanoid`·`physical ai`·`embodied`·`autonomous driving`·`self-driving`·`autonomous vehicle`
 중 하나를 소문자 부분 문자열로 포함)로 한 번 더 거른다. 짧은 단어(`ros`)는 오탐이 커서 넣지 않는다.
 
-**Reddit 은 비인증 JSON 이 막힌다.** `www.reddit.com/r/<sub>/top.json` · `api.reddit.com` · `old.reddit.com` 전부
-데이터센터 IP 에서 403 (실측 2026-09-08, Actions 런너도 같은 처지). Reddit "script" 앱을 만들어
-`REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` 을 Secrets 에 넣는다 (12절).
-**자격 증명이 없으면 Reddit 은 건너뛴다 — 0건이며 실패가 아니다.** 비인증 호출을 시도해 봐야 매주 실패로
-기록될 뿐이므로 시도하지 않는다. Reddit 은 선택 소스이고, 없으면 HN + 예비 풀로 5건을 채운다.
-단, Reddit 이 빠지면 "두 플랫폼에 다 오른 글" 의 합산 신호(위 3단계)가 사라진다는 점은 감수한다.
-
-**해외 소스는 서로 독립이다.** Reddit 이 403 이어도 HN·RSS 는 발행되고, RSS 피드 하나가 죽어도 나머지 피드는
+**해외 소스는 서로 독립이다.** HN 이 죽어도 RSS 는 수집되고, RSS 피드 하나가 죽어도 나머지 피드는
 수집된다. 실패한 소스는 로그와 종료 코드(1)로 드러낸다 — 2절 부분 발행 원칙의 해외판이다.
 
 - **HN 은 `search_by_date` 다.** `search`(관련도순)를 쓰면 기간 필터가 사실상 무력해진다.
   `tags=story` 로 댓글(`comment`)을 배제한다.
-- **Reddit `top?t=week` 결과는 수집 창으로 다시 필터한다 — 생략 불가.**
-  `t=week` 의 창은 **호출 시각 기준 최근 7일**이라 이 프로젝트의
-  "직전 월요일 00:00 ~ 일요일 23:59" 창과 **어긋난다** (2절).
-  월요일 08:30 실행이면 `t=week` 는 지난 월요일 아침 이후를 주므로,
-  창 첫날(월요일 새벽)이 빠지고 실행 당일 새벽이 섞여 들어온다.
-  `created_utc` 를 KST로 변환해 창 밖 항목을 버린다.
-- HN `created_at_i`, Reddit `created_utc` 는 **epoch(UTC)** 다. KST 변환은 수집기 책임이다.
+- HN `created_at_i` 는 **epoch(UTC)** 다. KST 변환은 수집기 책임이다. 응답을 다시 수집 창으로 필터한다.
 
 **보조 RSS 피드 목록** (v1.5 확정, 운영하며 조정). `<피드키>` 는 `article_id` 규약의 일부라 바꾸지 않는다.
 
@@ -571,7 +566,7 @@ fixture 의 `publisher` 값이 표에서 재현되지 않으면 그것은 표의
 
 ```python
 hn_raw     = 0.7 * log1p(points) + 0.3 * log1p(comments)
-reddit_raw = log1p(upvotes)
+reddit_raw = log1p(upvotes)      # 소스는 제거됐지만 공식·fixture 는 유지 (위 "Reddit 을 뺀 이유")
 ```
 
 > HN points는 롱테일이다. log 없이 min-max하면 1건이 스케일을 독점하고
@@ -580,7 +575,8 @@ reddit_raw = log1p(upvotes)
 **2) 소스별 min-max 정규화** — 분모는 **그 주 수집 풀** 이다 (전체 기간 아님).
 
 **3) 플랫폼 간 병합 시 정규화 점수 합산** — **상한 없음.**
-HN과 Reddit 양쪽에 올라온 글은 실제로 더 화제이므로 1.0을 넘어가는 것이 옳다.
+두 소스에 다 올라온 글은 실제로 더 화제이므로 1.0을 넘어가는 것이 옳다.
+(Reddit 제거 후 현재 병합 상대는 보조 RSS 뿐이라, 합산이 1.0 을 넘는 일은 드물다.)
 
 **min-max 공식을 유지한다.** `raw / max` 대안은 채택하지 않는다.
 1단계에서 이미 로그를 취했으므로 raw 값들이 서로 가깝고, max로 나누면
@@ -593,8 +589,8 @@ HN과 Reddit 양쪽에 올라온 글은 실제로 더 화제이므로 1.0을 넘
 #### 동점 처리
 
 min-max 특성상 각 소스의 1위는 **항상 정확히 1.0** 이다.
-HN 1위와 Reddit 1위가 둘 다 병합되지 않았다면 1.00000 동점이 나온다.
-이 동점은 우연이 아니라 **매주 상시 발생**한다.
+점수 있는 소스가 둘 이상이면 각 소스 1위끼리 1.00000 동점이 나온다 (fixture 주의 HN·Reddit 이 그 예).
+소스가 HN 하나뿐인 지금도 정확히 같은 점수는 언제든 나올 수 있으므로 규칙은 유지한다.
 
 - 정규화 점수가 같으면 **게시 시각이 이른 순**으로 정렬한다.
 
@@ -645,7 +641,7 @@ HN 1위와 Reddit 1위가 둘 다 병합되지 않았다면 1.00000 동점이 �
 arXiv·NVIDIA·DeepMind 블로그는 인기도 신호가 없어 애초에 경쟁이 불가능하다.
 0점을 줘서 형식적으로 경쟁시키지 않고, **랭킹 대상에서 뺀다.**
 
-대신 **HN+Reddit 결과가 5건에 못 미칠 때 채우는 예비 풀**로 쓴다.
+대신 **HN 결과가 5건에 못 미칠 때 채우는 예비 풀**로 쓴다.
 
 예비 풀 항목의 점수 표현:
 
@@ -666,7 +662,7 @@ arXiv·NVIDIA·DeepMind 블로그는 인기도 신호가 없어 애초에 경쟁
 예비 풀 **내부** 정렬은 **게시 시각 역순**(최신 우선)이다.
 `sort_score` 가 전부 `-1.0` 으로 같으므로 실질 정렬 기준은 이쪽이다.
 
-> RSS 항목이 HN·Reddit에도 올라온 경우는 URL 정규화 매칭으로 병합되며,
+> RSS 항목이 HN에도 올라온 경우는 URL 정규화 매칭으로 병합되며,
 > 이때는 병합된 쪽의 점수로 정상 경쟁한다 (예비 풀이 아니다).
 
 ### 국내 — 인기도 API 없음, 커버리지로 대체
@@ -1224,7 +1220,7 @@ if exists:
 | GitHub Actions | 무료 (월 사용량 10분 내외) |
 | Notion API | 무료 |
 | 카카오 나에게 보내기 | 무료 |
-| Hacker News / Reddit | 무료 |
+| Hacker News / 보조 RSS | 무료 |
 | 네이버 검색 API (API HUB) | 무료 (일 25,000건 한도, 실사용 주 수십 회). 유료 요금제 예정 — 도입 시 재확인 |
 | Gemini API | 월 수십~수백 원 |
 
@@ -1242,8 +1238,7 @@ if exists:
   — **2026-09-08 확인 완료**, 7절 "모델 ID" 에 기록. 구현 시점이 이보다 한 달 이상 뒤면 같은 절차로 재확인
 - 네이버 검색 API의 파라미터 및 페이지네이션 상한 (`start` 최대값 — 6절)
   — **2026-09-08 확인**: 엔드포인트가 NAVER API HUB 로 이관됨. 개발자센터 키·URL 은 쓰지 않는다 (6절)
-- Reddit `top?t=week` JSON 엔드포인트의 인증 요구 여부 (User-Agent 정책 포함)
-  — **2026-09-08 확인**: 비인증은 데이터센터 IP 에서 403. OAuth client_credentials 로 확정 (6절)
+- ~~Reddit `top?t=week` JSON 엔드포인트의 인증 요구 여부~~ — **2026-09-08 확인 후 소스 제거** (6절 "Reddit 을 뺀 이유")
 - arXiv export API 는 응답이 10초를 넘기기도 하고 연속 요청에 429 를 낸다 — 타임아웃 30초, 요청 간 3초 (6절)
 
 ---
@@ -1259,7 +1254,6 @@ if exists:
 | `NOTION_TOKEN` | Notion 쓰기 (Internal Integration, 만료 없음) |
 | `NOTION_ROOT_PAGE_ID` | 루트 페이지 |
 | `KAKAO_REST_API_KEY` / `KAKAO_REFRESH_TOKEN` | 알림 발송 |
-| `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` | Reddit 수집. reddit.com/prefs/apps 에서 **script** 타입 앱 생성 (6절). 없으면 Actions 에서 Reddit 만 빠진다 |
 | `GH_PAT` *(선택)* | repo Secrets 쓰기 권한이 있는 fine-grained PAT. 있으면 카카오 refresh token 재발급 시 자동 갱신 (8절) |
 | `KAKAO_CLIENT_SECRET` | [앱] > [플랫폼 키] > [REST API 키] > [클라이언트 시크릿]. **새 콘솔의 REST API 키는 이 기능이 기본으로 켜져 있다** (2026-09-08 문서 확인) — 없으면 토큰 요청이 `KOE010` 으로 실패한다. 갱신 호출에도 필요하므로 Actions 에도 넣는다. 콘솔에서 명시적으로 껐을 때만 생략 |
 

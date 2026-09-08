@@ -80,7 +80,7 @@ def services(tmp_path):
     overseas_raw = [RawArticle.from_dict(d) for d in _load("raw_articles_overseas.json")]
     s = Services(
         collect_domestic=lambda week: parse_fixture_pool(),
-        collect_overseas=lambda week: overseas_raw,
+        overseas_collectors={"fixture": lambda week: overseas_raw},
         enrich=_fake_enrich,
         summarize_call=_fake_call,
         notion=notion,
@@ -129,10 +129,21 @@ def test_dry_run_writes_nothing(services, capsys):
 
 def test_both_empty_makes_no_toggle_and_no_message(services):
     services.collect_domestic = lambda week: []
-    services.collect_overseas = lambda week: []
+    services.overseas_collectors = {"fixture": lambda week: []}
     result = run(services, now=NOW)
     assert result.status == "nothing_to_publish" and result.exit_code == 0
     assert services.fake_notion.toggles == {} and services.rec.sent == []
+
+
+def test_one_overseas_source_crash_keeps_the_others(services):
+    overseas_raw = services.overseas_collectors["fixture"](None)
+    services.overseas_collectors = {
+        "hn": lambda week: overseas_raw,
+        "reddit": lambda week: (_ for _ in ()).throw(RuntimeError("403")),
+    }
+    result = run(services, now=NOW)
+    assert result.status == "published" and result.overseas == 5
+    assert result.failures == ("collect_reddit",) and result.exit_code == 1
 
 
 def test_collector_crash_publishes_other_side_and_fails_the_job(services):

@@ -11,6 +11,7 @@ arXiv 두 카테고리는 같은 피드키를 쓰고 논문 ID 가 슬러그라,
 
 from __future__ import annotations
 
+import logging
 import re
 import time
 import xml.etree.ElementTree as ET
@@ -18,19 +19,24 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
+from functools import partial
 from urllib.parse import urlsplit
 
-from src.http import get_text
+from src import http
 from src.publishers import publisher_name
 from src.schema import KST, Origin, RawArticle, RawMetrics, SourceKind, WeekMeta, ensure_kst, now_kst
 from src.text import clean_html
 from src.urls import anchor_url, normalize_for_compare
 
+log = logging.getLogger(__name__)
+
 ATOM_NS = "{http://www.w3.org/2005/Atom}"
 ARXIV_DELAY_SECONDS = 3.0        # arXiv API 이용 약관: 요청 간 3초
+FEED_TIMEOUT = 30                # arXiv export API 는 10초를 넘기기도 한다 (실측 2026-09-08)
 _ARXIV_VERSION = re.compile(r"v\d+$")
 
 GetText = Callable[..., str]
+get_text: GetText = partial(http.get_text, timeout=FEED_TIMEOUT)
 
 
 @dataclass(frozen=True)
@@ -155,12 +161,19 @@ def fetch_feed(feed: Feed, week: WeekMeta, *, get_text: GetText = get_text,
 
 def collect_rss(week: WeekMeta, *, feeds: Iterable[Feed] = DEFAULT_FEEDS, get_text: GetText = get_text,
                 collected_at: datetime | None = None, sleep: Callable[[float], None] = time.sleep) -> list[RawArticle]:
+    """피드 전부 수집. **피드 하나의 실패가 나머지를 막지 않는다** — 건너뛰고 로그에 남긴다 (SPEC 6절)."""
     stamp = collected_at or now_kst()
     pooled: list[RawArticle] = []
     previous_key = None
     for feed in feeds:
         if feed.key == "arxiv" and previous_key == "arxiv":
             sleep(ARXIV_DELAY_SECONDS)
-        pooled.extend(fetch_feed(feed, week, get_text=get_text, collected_at=stamp))
         previous_key = feed.key
+        try:
+            got = fetch_feed(feed, week, get_text=get_text, collected_at=stamp)
+        except Exception as e:  # noqa: BLE001 — 예비 풀 피드 하나 때문에 해외 수집을 잃지 않는다
+            log.warning("rss %s 실패 — 건너뜀 (%s): %s", feed.key, feed.url, e)
+            continue
+        log.info("rss %s: 창 안 %d건 (%s)", feed.key, len(got), feed.url)
+        pooled.extend(got)
     return dedupe(pooled)

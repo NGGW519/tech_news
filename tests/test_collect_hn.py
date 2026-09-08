@@ -59,9 +59,24 @@ class FakeAlgolia:
         return {"hits": self.pages[page], "nbPages": len(self.pages), "page": page}
 
 
-def _hit(i: int, epoch: int) -> dict:
-    return {"objectID": str(i), "title": f"t{i}", "url": f"https://a.com/{i}", "story_text": None,
+def _hit(i: int, epoch: int, title: str | None = None) -> dict:
+    return {"objectID": str(i), "title": title or f"Robot story {i}", "url": f"https://a.com/{i}", "story_text": None,
             "author": "u", "points": 1, "num_comments": 0, "created_at_i": epoch}
+
+
+def test_title_keyword_filter_drops_fuzzy_matches():
+    # 실측: Algolia 가 "robot" 검색에 "root", "humanoid" 검색에 "Humanitas" 를 돌려준다
+    inside = int(datetime(2026, 8, 12, 12, 0, tzinfo=KST).timestamp())
+    fake = FakeAlgolia([[
+        _hit(1, inside, "Omarchy: Any User Process Can Escalate to Root"),
+        _hit(2, inside, "Thoughts on Pope Leo XIV's Magnifica Humanitas"),
+        _hit(3, inside, "Launch HN: Nori Robotics – a low-cost humanoid"),
+        _hit(4, inside, "Waymo expands self-driving to freeways"),
+        _hit(5, inside, "Physical AI needs better simulators"),
+    ]])
+    got = fetch_query("robot", WEEK, get_json=fake, collected_at=COLLECTED)
+    assert [a.article_id for a in got] == ["hn:3", "hn:4", "hn:5"]
+    assert fake.calls[0][1]["restrictSearchableAttributes"] == "title"
 
 
 def test_fetch_paginates_all_pages_and_refilters_window():

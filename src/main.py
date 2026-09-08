@@ -35,7 +35,7 @@ from src.notion import NotionApi, block_anchor_url
 from src.rank_domestic import rank_domestic
 from src.rank_overseas import TOP_N, OverseasRanking, rank_overseas
 from src.render_notion import render_brief_text, render_week_toggle
-from src.schema import KST, RankedArticle, RawArticle, SummaryStatus, WeekMeta, WeeklyBrief, now_kst
+from src.schema import KST, RankedArticle, RawArticle, SummaryStatus, WeekMeta, WeeklyBrief, now_kst  # noqa: F401
 from src.summarize import Call, call_gemini, summarize_section
 from src.week import current_week
 
@@ -47,7 +47,7 @@ LOG_FILE = PROJECT_ROOT / "logs" / "last_run.txt"
 @dataclass
 class Services:
     collect_domestic: Callable[[WeekMeta], list[RawArticle]]
-    collect_overseas: Callable[[WeekMeta], list[RawArticle]]
+    overseas_collectors: dict[str, Callable[[WeekMeta], list[RawArticle]]]   # 소스별로 따로 감싼다 — 하나가 죽어도 나머지는 산다
     enrich: Callable[[list[RankedArticle]], list[RankedArticle]]
     summarize_call: Call
     notion: NotionApi
@@ -82,11 +82,6 @@ def _no_llm_call(_: dict) -> dict:
 
 
 def build_services(settings: Settings, *, no_llm: bool = False) -> Services:
-    def overseas(week: WeekMeta) -> list[RawArticle]:
-        stamp = now_kst()
-        return (collect_hn(week, collected_at=stamp) + collect_reddit(week, collected_at=stamp)
-                + collect_rss(week, collected_at=stamp))
-
     def persist(new_token: str) -> None:
         path = os.environ.get("KAKAO_NEW_REFRESH_TOKEN_FILE")
         if path:
@@ -99,7 +94,12 @@ def build_services(settings: Settings, *, no_llm: bool = False) -> Services:
     return Services(
         collect_domestic=lambda week: collect_domestic(
             week, client_id=settings.naver_client_id, client_secret=settings.naver_client_secret),
-        collect_overseas=overseas,
+        overseas_collectors={
+            "hn": collect_hn,
+            "reddit": lambda week: collect_reddit(
+                week, client_id=settings.reddit_client_id, client_secret=settings.reddit_client_secret),
+            "rss": collect_rss,
+        },
         enrich=enrich_ranked,
         summarize_call=_no_llm_call if no_llm else partial(call_gemini, api_key=settings.gemini_api_key),
         notion=NotionApi(settings.notion_token),
@@ -138,9 +138,13 @@ def run(services: Services, *, now: datetime | None = None, dry_run: bool = Fals
     failures: list[str] = []
     log.info("week %s / window %s ~ %s", week.week_key, week.window_start, week.window_end)
 
-    # 1. 수집 — 국내·해외 독립
+    # 1. 수집 — 국내·해외 독립, 해외는 소스별로도 독립
     domestic_raw = _guard("collect_domestic", lambda: services.collect_domestic(week), [], failures)
-    overseas_raw = _guard("collect_overseas", lambda: services.collect_overseas(week), [], failures)
+    overseas_raw: list[RawArticle] = []
+    for name, collector in services.overseas_collectors.items():
+        got = _guard(f"collect_{name}", lambda c=collector: c(week), [], failures)
+        log.info("collected %s: %d건", name, len(got))
+        overseas_raw.extend(got)
     log.info("collected domestic %d / overseas %d", len(domestic_raw), len(overseas_raw))
 
     # 2. 랭킹 (+ 예비 풀 보충)

@@ -1,12 +1,15 @@
-"""src/collect_reddit.py — 리스팅 파싱(순수) → raw_articles_overseas.json 의 Reddit 5건 재현 + 창 재필터."""
+"""src/collect_reddit.py — 리스팅 파싱(순수) → raw_articles_overseas.json 의 Reddit 5건 재현 + 창 재필터 + OAuth."""
 
 from __future__ import annotations
 
+import base64
 import json
 from datetime import datetime
 from pathlib import Path
 
-from src.collect_reddit import collect_reddit, fetch_subreddit, parse_listing
+import pytest
+
+from src.collect_reddit import collect_reddit, fetch_subreddit, get_app_token, parse_listing
 from src.schema import KST
 from src.week import compute_week
 
@@ -51,25 +54,52 @@ def test_fetch_refilters_to_window_and_drops_stickied():
     too_old = datetime(2026, 8, 9, 20, 0, tzinfo=KST).timestamp()
     calls = []
 
-    def fake(url, params):
-        calls.append((url, dict(params)))
+    def fake(url, params, headers=None):
+        calls.append((url, dict(params), headers))
         return {"kind": "Listing", "data": {"children": [
             _post("a", inside), _post("b", too_new), _post("c", too_old), _post("d", inside, stickied=True),
         ]}}
 
     got = fetch_subreddit("robotics", WEEK, get_json=fake, collected_at=COLLECTED)
     assert [a.article_id for a in got] == ["reddit:a"]
-    url, params = calls[0]
-    assert url == "https://www.reddit.com/r/robotics/top.json"
+    url, params, headers = calls[0]
+    assert url == "https://www.reddit.com/r/robotics/top.json" and headers is None
     assert params == {"t": "week", "limit": "100", "raw_json": "1"}
 
 
-def test_collect_iterates_subreddits():
+def test_oauth_path_uses_app_token_and_oauth_host():
     seen = []
 
-    def fake(url, params):
+    def fake_post(url, form, headers=None):
+        seen.append(("POST", url, dict(form), dict(headers)))
+        return {"access_token": "app-token", "token_type": "bearer"}
+
+    def fake_get(url, params, headers=None):
+        seen.append(("GET", url, dict(params), headers))
+        return {"data": {"children": []}}
+
+    assert collect_reddit(WEEK, get_json=fake_get, post_form=fake_post, collected_at=COLLECTED,
+                          client_id="cid", client_secret="sec") == []
+    post = seen[0]
+    assert post[1] == "https://www.reddit.com/api/v1/access_token" and post[2] == {"grant_type": "client_credentials"}
+    assert post[3]["Authorization"] == "Basic " + base64.b64encode(b"cid:sec").decode()
+    gets = [s for s in seen if s[0] == "GET"]
+    assert [g[1] for g in gets] == ["https://oauth.reddit.com/r/robotics/top", "https://oauth.reddit.com/r/MachineLearning/top"]
+    assert all(g[3] == {"Authorization": "Bearer app-token"} for g in gets)
+
+
+def test_app_token_failure_raises():
+    with pytest.raises(RuntimeError, match="app token"):
+        get_app_token("c", "s", post_form=lambda u, f, h=None: {"error": "invalid_grant"})
+
+
+def test_without_credentials_falls_back_to_public_json(caplog):
+    seen = []
+
+    def fake(url, params, headers=None):
         seen.append(url)
         return {"data": {"children": []}}
 
     assert collect_reddit(WEEK, get_json=fake, collected_at=COLLECTED) == []
     assert seen == ["https://www.reddit.com/r/robotics/top.json", "https://www.reddit.com/r/MachineLearning/top.json"]
+    assert "자격 증명" in caplog.text

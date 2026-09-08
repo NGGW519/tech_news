@@ -67,6 +67,19 @@ def test_fetch_filters_window_and_passes_params():
     assert calls[0] == (DEEPMIND.url, None)
 
 
+def test_one_dead_feed_does_not_block_the_others(caplog):
+    feeds = (ARXIV_RO, DEEPMIND)
+
+    def fake(url, params=None):
+        if "arxiv" in url:
+            raise TimeoutError("arxiv slow")
+        return _xml("api_rss_deepmind.xml")
+
+    got = collect_rss(WEEK, feeds=feeds, get_text=fake, collected_at=COLLECTED, sleep=lambda s: None)
+    assert [a.article_id for a in got] == ["rss:deepmind:gemini-robotics-1-5"]
+    assert "rss arxiv 실패" in caplog.text
+
+
 def test_collect_dedupes_cross_listed_arxiv_and_sleeps_between_arxiv_calls():
     slept = []
     feeds = (ARXIV_RO, Feed("arxiv", "http://export.arxiv.org/api/query?search_query=cat:cs.AI"), DEEPMIND)

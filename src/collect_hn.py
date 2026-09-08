@@ -26,10 +26,21 @@ from src.urls import anchor_url, normalize_for_compare
 HN_SEARCH_URL = "https://hn.algolia.com/api/v1/search_by_date"
 HN_ITEM_URL = "https://news.ycombinator.com/item?id={id}"
 DEFAULT_QUERIES: tuple[str, ...] = ("robot", "robotics", "humanoid", "physical AI", "autonomous driving")
+#: Algolia 는 오타 허용·접두 매칭으로 "robot"→"root", "humanoid"→"Humanitas" 를 돌려준다 (실측 2026-09-08).
+#: 그래서 제목에 이 단어 중 하나가 **실제로** 들어 있는 글만 남긴다. 소문자 부분 문자열 매칭이며
+#: "robot" 이 robotics/robots 를 덮는다. 짧은 단어(ros 등)는 오탐이 커 넣지 않는다.
+TITLE_KEYWORDS: tuple[str, ...] = (
+    "robot", "humanoid", "physical ai", "embodied", "autonomous driving", "self-driving", "autonomous vehicle",
+)
 HITS_PER_PAGE = 100
 MAX_PAGES = 10          # Algolia 상한 1000건
 
 GetJson = Callable[..., Any]
+
+
+def title_matches(title: str, keywords: Iterable[str] = TITLE_KEYWORDS) -> bool:
+    lowered = title.lower()
+    return any(k in lowered for k in keywords)
 
 
 def parse_hit(hit: dict[str, Any], query: str, collected_at: datetime) -> RawArticle:
@@ -73,9 +84,11 @@ def fetch_query(query: str, week: WeekMeta, *, get_json: GetJson = get_json,
         payload = get_json(HN_SEARCH_URL, {
             "query": query, "tags": "story",
             "numericFilters": f"created_at_i>{start},created_at_i<{end}",
+            "restrictSearchableAttributes": "title",
             "hitsPerPage": str(HITS_PER_PAGE), "page": str(page),
         })
-        kept.extend(a for a in parse_hits(payload, query, stamp) if week.contains(a.published_at))
+        kept.extend(a for a in parse_hits(payload, query, stamp)
+                    if week.contains(a.published_at) and title_matches(a.title))
         if page + 1 >= int(payload.get("nbPages", 1)):
             break
     return kept

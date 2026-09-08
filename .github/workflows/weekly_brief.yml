@@ -39,6 +39,8 @@ jobs:
           KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
           KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
           KAKAO_NEW_REFRESH_TOKEN_FILE: ${{ runner.temp }}/kakao_refresh_token
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
         run: python -m src.main
 
       # 카카오가 새 refresh token 을 돌려준 경우(잔여 1개월 미만) Secrets 를 갱신한다.

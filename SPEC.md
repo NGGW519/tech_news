@@ -518,9 +518,23 @@ fixture 의 `publisher` 값이 표에서 재현되지 않으면 그것은 표의
 
 | 소스 | 호출 |
 |---|---|
-| Hacker News | Algolia `search_by_date`, `tags=story`, `numericFilters=created_at_i>{수집 창 시작 epoch}` |
-| Reddit | `top?t=week` (서브레딧별) |
-| 보조 RSS | 피드 전체를 받아 `pubDate`/`updated` 로 수집 창 필터 |
+| Hacker News | Algolia `search_by_date`, `tags=story`, `query=<키워드>`, `restrictSearchableAttributes=title`, `numericFilters=created_at_i>{창 시작},created_at_i<{창 끝}` |
+| Reddit | **OAuth2 client_credentials** (script 앱) → `https://oauth.reddit.com/r/<sub>/top?t=week&limit=100&raw_json=1` |
+| 보조 RSS | 피드 전체를 받아 `pubDate`/`updated` 로 수집 창 필터. 타임아웃 30초 |
+
+**HN 은 키워드로 호출한다** (`robot`, `robotics`, `humanoid`, `physical AI`, `autonomous driving` — 운영하며 조정).
+키워드 없이 전체 스토리를 받으면 주제와 무관한 글이 풀을 채운다. 그런데 Algolia 는 오타 허용·접두 매칭이라
+`robot` 검색에 "root", `humanoid` 검색에 "Humanitas" 가 섞여 온다 (실측 2026-09-08). 그래서 응답을
+**제목 키워드 필터**(`robot`·`humanoid`·`physical ai`·`embodied`·`autonomous driving`·`self-driving`·`autonomous vehicle`
+중 하나를 소문자 부분 문자열로 포함)로 한 번 더 거른다. 짧은 단어(`ros`)는 오탐이 커서 넣지 않는다.
+
+**Reddit 은 비인증 JSON 이 막힌다.** `www.reddit.com/r/<sub>/top.json` · `api.reddit.com` · `old.reddit.com` 전부
+데이터센터 IP 에서 403 (실측 2026-09-08, Actions 런너도 같은 처지). Reddit "script" 앱을 만들어
+`REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` 을 Secrets 에 넣는다 (12절). 자격 증명이 없으면 비인증 경로를
+시도하고 경고를 남긴다 — 집 IP 에서 로컬 실행할 때는 통한다.
+
+**해외 소스는 서로 독립이다.** Reddit 이 403 이어도 HN·RSS 는 발행되고, RSS 피드 하나가 죽어도 나머지 피드는
+수집된다. 실패한 소스는 로그와 종료 코드(1)로 드러낸다 — 2절 부분 발행 원칙의 해외판이다.
 
 - **HN 은 `search_by_date` 다.** `search`(관련도순)를 쓰면 기간 필터가 사실상 무력해진다.
   `tags=story` 로 댓글(`comment`)을 배제한다.
@@ -1206,6 +1220,8 @@ if exists:
   — **2026-09-08 확인 완료**, 7절 "모델 ID" 에 기록. 구현 시점이 이보다 한 달 이상 뒤면 같은 절차로 재확인
 - 네이버 검색 API의 파라미터 및 페이지네이션 상한 (`start` 최대값 — 6절)
 - Reddit `top?t=week` JSON 엔드포인트의 인증 요구 여부 (User-Agent 정책 포함)
+  — **2026-09-08 확인**: 비인증은 데이터센터 IP 에서 403. OAuth client_credentials 로 확정 (6절)
+- arXiv export API 는 응답이 10초를 넘기기도 하고 연속 요청에 429 를 낸다 — 타임아웃 30초, 요청 간 3초 (6절)
 
 ---
 
@@ -1220,6 +1236,7 @@ if exists:
 | `NOTION_TOKEN` | Notion 쓰기 (Internal Integration, 만료 없음) |
 | `NOTION_ROOT_PAGE_ID` | 루트 페이지 |
 | `KAKAO_REST_API_KEY` / `KAKAO_REFRESH_TOKEN` | 알림 발송 |
+| `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` | Reddit 수집. reddit.com/prefs/apps 에서 **script** 타입 앱 생성 (6절). 없으면 Actions 에서 Reddit 만 빠진다 |
 | `GH_PAT` *(선택)* | repo Secrets 쓰기 권한이 있는 fine-grained PAT. 있으면 카카오 refresh token 재발급 시 자동 갱신 (8절) |
 | `KAKAO_CLIENT_SECRET` | [앱] > [플랫폼 키] > [REST API 키] > [클라이언트 시크릿]. **새 콘솔의 REST API 키는 이 기능이 기본으로 켜져 있다** (2026-09-08 문서 확인) — 없으면 토큰 요청이 `KOE010` 으로 실패한다. 갱신 호출에도 필요하므로 Actions 에도 넣는다. 콘솔에서 명시적으로 껐을 때만 생략 |
 

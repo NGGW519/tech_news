@@ -21,3 +21,7 @@ out/
 .vscode/
 .idea/
 .DS_Store*:Zone.Identifier
+
+# 하네스 중간 산출물 (에이전트 팀 워크스페이스 — 감사 추적용으로 로컬 보존, 커밋하지 않음)
+_workspace/
+_workspace_*/

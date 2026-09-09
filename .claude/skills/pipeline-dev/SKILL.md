@@ -1,6 +1,6 @@
 ---
 name: pipeline-dev
-description: "tech-news-orchestrator 가 pipeline-engineer 에게 시키는 하위 절차 — 사용자 요청은 오케스트레이터가 먼저 받는다. 주간 테크 뉴스 브리핑 파이프라인 src/·tests/·.github/workflows/ 구현 규약: 모듈 맵(19개 모듈의 역할·SPEC 절·순수/네트워크·테스트·튜닝 상수), Services 주입·_guard 격리·KST·article_id/extra 키 계약, 금지 항목, 테스트 우선 변경 절차, dry-run 실측 명령과 비용, fixture 갱신 규칙, 커밋 규약(푸시 금지). 수집기·랭킹·보강·요약·Notion·카카오·진입점·워크플로우 코드를 고치거나 키워드·임계값·타임아웃·publisher 표를 튜닝하는 에이전트는 이 스킬을 읽는다. SPEC 규칙 자체를 바꾸는 일은 spec-change 가 먼저다."
+description: "tech-news-orchestrator 가 pipeline-engineer 에게 시키는 하위 절차 — 사용자 요청은 오케스트레이터가 먼저 받는다. 주간 테크 뉴스 브리핑 파이프라인 src/·tests/·.github/workflows/ 구현 규약: 모듈 맵(18개 모듈의 역할·SPEC 절·순수/네트워크·테스트·튜닝 상수), Services 주입·_guard 격리·KST·article_id/extra 키 계약, 금지 항목, 테스트 우선 변경 절차, dry-run 실측 명령과 비용, fixture 갱신 규칙, 커밋 규약(푸시 금지). 수집기·랭킹·보강·요약·Notion·카카오·진입점·워크플로우 코드를 고치거나 키워드·임계값·타임아웃·publisher 표를 튜닝하는 에이전트는 이 스킬을 읽는다. SPEC 규칙 자체를 바꾸는 일은 spec-change 가 먼저다."
 ---
 
 # 파이프라인 구현 규약

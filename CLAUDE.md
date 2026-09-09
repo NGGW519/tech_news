@@ -15,3 +15,4 @@
 | 2026-09-09 | 하위 스킬 4개 description 에 "오케스트레이터가 진입점" 표시, 오케스트레이터 제외 조항 정량화·저장소 범위 명시 | skills/* description | 트리거 판정 20/20 통과했으나 하위 스킬이 동급 경쟁 |
 | 2026-09-09 | 경계면 #3 생산자를 해외 수집기로 정정, fallback 원천 순서(입력 순서와 반대) 명시, Reddit 제거·fixture 유지 사실, dry-run 전제(.env 7키·실제 수집 호출), incremental QA 루프 순서 | skills/pipeline-qa, pipeline-dev | QA 실행 테스트에서 스킬 문서 오류 5건 발견 |
 | 2026-09-09 | 진단 트리에 "run_at 이 정기 슬롯 아니면 수동 실행 → 정기 실행 부재 원인부터", "already_exists 면 카카오 미호출" 추가 | skills/ops-runbook | with/without 실행 테스트 두 쪽이 공통으로 도달한 통찰 |
+| 2026-09-09 | 팀원 프롬프트 첫 줄에 에이전트 정의 파일 Read 지시를 항상 넣도록 규칙화 | skills/tech-news-orchestrator | 프로브: 세션 중 생성한 커스텀 타입은 스폰은 되지만 정의가 시스템 프롬프트로 로드되지 않음 |

@@ -35,28 +35,8 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_ROOT_PAGE_ID: ${{ secrets.NOTION_ROOT_PAGE_ID }}
-          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
-          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
-          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
-          KAKAO_NEW_REFRESH_TOKEN_FILE: ${{ runner.temp }}/kakao_refresh_token
+          NOTION_USER_ID: ${{ secrets.NOTION_USER_ID }}
         run: python -m src.main
-
-      # 카카오가 새 refresh token 을 돌려준 경우(잔여 1개월 미만) Secrets 를 갱신한다.
-      # GITHUB_TOKEN 은 Secrets 를 쓸 수 없으므로 repo secrets 권한이 있는 PAT(GH_PAT)가 있을 때만 동작한다.
-      # 없으면 경고만 남고, 만료 전에 scripts/kakao_refresh_token.py 로 수동 재발급해야 한다.
-      - name: Rotate Kakao refresh token
-        if: always()
-        env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
-          TOKEN_FILE: ${{ runner.temp }}/kakao_refresh_token
-        run: |
-          if [ ! -s "$TOKEN_FILE" ]; then exit 0; fi
-          if [ -z "$GH_TOKEN" ]; then
-            echo "::warning::카카오 refresh token 이 재발급됐지만 GH_PAT 이 없어 Secrets 를 갱신하지 못했다. 만료 전 수동 재발급 필요"
-            exit 0
-          fi
-          gh secret set KAKAO_REFRESH_TOKEN --repo "$GITHUB_REPOSITORY" < "$TOKEN_FILE"
-          echo "KAKAO_REFRESH_TOKEN secret updated"
 
       - name: Commit run log
         if: always()

@@ -1,6 +1,6 @@
 ---
 name: tech-news-orchestrator
-description: "주간 테크 뉴스 브리핑 파이프라인(tech_news) 에이전트 팀 오케스트레이터 — 이 저장소의 파이프라인에 관한 모든 작업 요청의 유일한 사용자 진입점. 수집(네이버/HN/RSS)·랭킹·본문 보강·Gemini 요약·Notion·카카오·GitHub Actions 워크플로우(cron 포함)·SPEC·fixture·실행 로그·자격 증명에 관한 변경·수정·튜닝·진단·감사·검증 요청이 오면 반드시 이 스킬을 사용할 것. 예: '지난주 실행 왜 실패했어', '카톡이 안 왔어', '토큰 만료된 것 같아', '수집 키워드 추가해줘', '임계값 바꿔서 실측해봐', '소스 추가/제거', 'publisher 표에 매체 추가', 'Gemini 모델 ID 아직 유효한지 확인', 'SPEC 이랑 코드 맞는지 감사', 'fixture 점검', '테스트 돌려서 검증해줘', '워크플로우 수정'. 후속 작업 — '다시 실행', '재실행', '수정', '보완', '업데이트', '이전 결과 기반으로 개선', '~만 다시', '이전 진단 재확인' 도 이 스킬. 하위 스킬(spec-change, pipeline-dev, pipeline-qa, ops-runbook)은 이 스킬이 팀원에게 시키는 절차이므로 사용자 요청에 직접 매칭하지 않는다. 제외: 파일 변경·실행·검증이 필요 없는 순수 설명 요청(값 하나, 필드 정의, 함수 동작 설명)은 직접 답한다 — 단, 실측·재실행·수정·검증·진단이 한 단어라도 들어가면 이 스킬. 대상이 이 저장소 밖(Notion·Gemini·카카오 API 를 쓰는 별개 신규 프로젝트)이면 해당 없음."
+description: "주간 테크 뉴스 브리핑 파이프라인(tech_news) 에이전트 팀 오케스트레이터 — 이 저장소의 파이프라인에 관한 모든 작업 요청의 유일한 사용자 진입점. 수집(네이버/HN/RSS)·랭킹·본문 보강·Gemini 요약·Notion·알림·GitHub Actions 워크플로우(cron 포함)·SPEC·fixture·실행 로그·자격 증명에 관한 변경·수정·튜닝·진단·감사·검증 요청이 오면 반드시 이 스킬을 사용할 것. 예: '지난주 실행 왜 실패했어', '알림이 안 왔어', '권한 설정이 잘못된 것 같아', '수집 키워드 추가해줘', '임계값 바꿔서 실측해봐', '소스 추가/제거', 'publisher 표에 매체 추가', 'Gemini 모델 ID 아직 유효한지 확인', 'SPEC 이랑 코드 맞는지 감사', 'fixture 점검', '테스트 돌려서 검증해줘', '워크플로우 수정'. 후속 작업 — '다시 실행', '재실행', '수정', '보완', '업데이트', '이전 결과 기반으로 개선', '~만 다시', '이전 진단 재확인' 도 이 스킬. 하위 스킬(spec-change, pipeline-dev, pipeline-qa, ops-runbook)은 이 스킬이 팀원에게 시키는 절차이므로 사용자 요청에 직접 매칭하지 않는다. 제외: 파일 변경·실행·검증이 필요 없는 순수 설명 요청(값 하나, 필드 정의, 함수 동작 설명)은 직접 답한다 — 단, 실측·재실행·수정·검증·진단이 한 단어라도 들어가면 이 스킬. 대상이 이 저장소 밖(Notion·Gemini API 를 쓰는 별개 신규 프로젝트)이면 해당 없음."
 ---
 
 # Tech News Orchestrator — 파이프라인 유지보수 팀 조율
@@ -58,7 +58,7 @@ description: "주간 테크 뉴스 브리핑 파이프라인(tech_news) 에이�
 
 | 유형 | 예 | Phase 2 (서브) | Phase 3 승인 | Phase 4 (팀) |
 |------|-----|---------------|------------|-------------|
-| **A. 운영 진단** | "왜 실패했어", "카톡 안 왔어", "0건 나왔어" | ops-investigator | 조치가 상태 변경이면 필요 | 코드 원인이면 B 로 승격 (spec-guardian 을 그때 스폰) |
+| **A. 운영 진단** | "왜 실패했어", "알림 안 왔어", "0건 나왔어" | ops-investigator | 조치가 상태 변경이면 필요 | 코드 원인이면 B 로 승격 (spec-guardian 을 그때 스폰) |
 | **B. SPEC 범위 내 변경** | 키워드 추가, 타임아웃 조정, publisher 표 확장, 임계값 튜닝 | spec-guardian (경미 확인) | 불필요 | pipeline-engineer + pipeline-qa |
 | **C. 설계 변경** | 소스 추가/제거, fallback 순서, 스키마 필드, 출력 형식 | spec-guardian + ops-investigator(외부 사실 필요 시) | **필수** — SPEC 개정안 승인 | spec-guardian(개정 반영) → pipeline-engineer + pipeline-qa |
 | **D. 외부 사양 확인** | "모델 ID 유효?", "SPEC 11절 점검" | ops-investigator | 불필요 | 변경 필요 시 C (spec-guardian 을 그때 스폰) |
@@ -188,10 +188,10 @@ description: "주간 테크 뉴스 브리핑 파이프라인(tech_news) 에이�
 
 ### 정상 흐름 — B 유형 (임계값 튜닝)
 1. 사용자: "국내 클러스터가 너무 잘게 쪼개지는 것 같아. 자카드 임계값 0.30 으로 실측해보고 괜찮으면 바꿔줘"
-2. Phase 0: `_workspace/` 없음 → 초기 실행. Phase 1: B 로 분류 (SPEC 6절이 "운영 중 튜닝 대상"으로 명시), 기준선 216 passed, `ToolSearch("select:SendMessage")`
+2. Phase 0: `_workspace/` 없음 → 초기 실행. Phase 1: B 로 분류 (SPEC 6절이 "운영 중 튜닝 대상"으로 명시), 기준선 221 passed, `ToolSearch("select:SendMessage")`
 3. Phase 2: `Agent(spec-guardian)` → impact: 닿는 절 6절, 고정 항목 아님, 검증 기준 = fixture 클러스터 4/3/2 유지 + 실측 건수
 4. Phase 4: `Agent(pipeline-engineer)` + `Agent(pipeline-qa)` 동시 스폰. engineer 가 `JACCARD_THRESHOLD` 변경 + `test_rank_domestic.py` 통과 + `--dry-run --no-llm --date 2026-09-08` 실측 → `SendMessage(to: "pipeline-qa")` → qa 가 `test_rank_domestic.py`, `check_fixtures.py`, 실측 출력 검토 → PASS → 리더에게 리포트 경로
-5. Phase 5: pytest 216 passed, 커밋 "실측 튜닝: 국내 자카드 임계값 0.35 → 0.30 (…근거)". spec-guardian 에게 `SendMessage` 로 SPEC 6절 값 갱신 요청·확인
+5. Phase 5: pytest 221 passed, 커밋 "실측 튜닝: 국내 자카드 임계값 0.35 → 0.30 (…근거)". spec-guardian 에게 `SendMessage` 로 SPEC 6절 값 갱신 요청·확인
 6. 예상 결과: 커밋 1개(푸시 없음), `_workspace/00~03_*.md` 4개
 
 ### 설계 변경 흐름 — C 유형 (소스 추가)
@@ -202,10 +202,10 @@ description: "주간 테크 뉴스 브리핑 파이프라인(tech_news) 에이�
 5. 예상 결과: SPEC 헤더에 "1.6 변경" 블록, 커밋 1개
 
 ### 에러 흐름 — A 유형에서 재현 불가
-1. 사용자: "이번 주 카톡이 안 왔어"
-2. Phase 2: `Agent(ops-investigator)` 가 `last_run.txt` 읽음 → `run_at` 이 정기 슬롯이 아님(수동 실행) + `status: already_exists` → 카카오는 호출조차 안 됐음. 정기 실행 부재 원인을 git 이력에서 확인. `gh` 없어 Actions 로그 못 읽음
+1. 사용자: "이번 주 알림이 안 왔어"
+2. Phase 2: `Agent(ops-investigator)` 가 `last_run.txt` 읽음 → `run_at` 이 정기 슬롯이 아님(수동 실행) + `status: already_exists` → Notion 쓰기도 알림도 없었음. 정기 실행 부재 원인을 git 이력에서 확인. `gh` 없어 Actions 로그 못 읽음
 3. 판정: 설정/배포 시점. 코드 수정 불필요 → Phase 4 생략 (spec-guardian 스폰 안 함)
-4. Phase 5: 사용자 조치 안내 — Notion 토글 직접 확인, 알림이 꼭 필요하면 토글 삭제 후 다음 월요일 전에 `workflow_dispatch`, `scripts/kakao_refresh_token.py --test` 로 경로 확인
+4. Phase 5: 사용자 조치 안내 — 폰·PC 에서 Notion 을 열어 두지 않았는지 먼저 확인(열려 있으면 푸시 대신 뱃지, SPEC 8절), Notion 토글 직접 확인, 알림이 꼭 필요하면 토글 삭제 후 다음 월요일 전에 `workflow_dispatch`
 5. 예상 결과: 코드 변경 없음, `_workspace/01_ops-investigator_diagnosis.md` 1개, 보고서에 "재현: 로컬 .env 기준 / Actions 로그 미확인" 명시
 
 ### 에러 흐름 — Phase 4 에서 qa 무응답

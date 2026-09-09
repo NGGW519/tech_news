@@ -3,7 +3,7 @@
     1. 루트 아래 월 페이지 `2026-09` → 없으면 생성, 있으면 재사용
     2. 월 페이지 블록 조회(페이지네이션) → `week_key` 로 시작하는 토글이 있으면 "이미 존재"
     3. 주차 토글 append → 생성된 블록 id
-    4. 카톡 링크 = https://www.notion.so/<page_id>#<하이픈 제거한 block_id>. 못 얻으면 월 페이지 URL
+    4. 로그 링크 = https://www.notion.so/<page_id>#<하이픈 제거한 block_id>. 못 얻으면 월 페이지 URL
 
 HTTP 함수는 주입 가능하다 (get_json / post_json / patch_json). 렌더링은 src/render_notion.py 가 한다.
 """
@@ -33,7 +33,11 @@ def page_url(page_id: str) -> str:
 
 
 def block_anchor_url(page_id: str, block_id: str | None) -> str:
-    """주차 토글 앵커. block_id 가 없으면 월 페이지 URL 로 fallback (SPEC 8절)."""
+    """주차 토글 앵커. block_id 가 없으면 월 페이지 URL 로 fallback (SPEC 8절).
+
+    **로그 전용이다** — `logs/last_run.txt` 의 `notion:` 필드가 유일한 소비자다.
+    알림은 토글 안의 mention 이 담당하고 URL 없이 그 줄로 데려가므로 알림 경로에는 쓰이지 않는다.
+    """
     return f"{page_url(page_id)}#{_bare(block_id)}" if block_id else page_url(page_id)
 
 

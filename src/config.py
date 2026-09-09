@@ -9,9 +9,10 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ENV_FILE = PROJECT_ROOT / ".env"
 
+# SPEC 12절 자격 증명 표와 워크플로우 env: 와 1:1. 셋 중 하나만 바뀌면 drift 다.
 REQUIRED = (
     "NAVER_CLIENT_ID", "NAVER_CLIENT_SECRET", "GEMINI_API_KEY",
-    "NOTION_TOKEN", "NOTION_ROOT_PAGE_ID", "KAKAO_REST_API_KEY", "KAKAO_REFRESH_TOKEN",
+    "NOTION_TOKEN", "NOTION_ROOT_PAGE_ID", "NOTION_USER_ID",
 )
 
 
@@ -34,9 +35,7 @@ class Settings:
     gemini_api_key: str
     notion_token: str
     notion_root_page_id: str
-    kakao_rest_api_key: str
-    kakao_refresh_token: str
-    kakao_client_secret: str | None = None     # 클라이언트 시크릿을 켠 앱만
+    notion_user_id: str                        # 알림 멘션 대상. 만료 없는 상수 UUID (SPEC 8·12절)
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -49,7 +48,5 @@ class Settings:
             gemini_api_key=os.environ["GEMINI_API_KEY"],
             notion_token=os.environ["NOTION_TOKEN"],
             notion_root_page_id=os.environ["NOTION_ROOT_PAGE_ID"],
-            kakao_rest_api_key=os.environ["KAKAO_REST_API_KEY"],
-            kakao_refresh_token=os.environ["KAKAO_REFRESH_TOKEN"],
-            kakao_client_secret=os.environ.get("KAKAO_CLIENT_SECRET") or None,
+            notion_user_id=os.environ["NOTION_USER_ID"],
         )

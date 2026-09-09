@@ -60,12 +60,20 @@ SKILL.md 경계면 표의 각 행을 실제 코드 위치와 fixture 가 심어 
 - 확인: 비교에 `week_label` 이나 건수가 섞이면 재실행 시 토글이 두 개 (9절). `iter_children` 페이지네이션(`PAGE_SIZE` 100)
 - 함정 (fixture): `week_meta.json` 의 월/연 경계·5주차 케이스. 비월요일 `--date` 는 그 주 월요일로 스냅
 
-## 8. Notion → 카카오
+## 8. 렌더 → Notion (알림)
 
-- 생산자: `notion.append_week_toggle` 반환 `block_id` (None 가능)
-- 소비자: `notion.block_anchor_url(page_id, block_id)` — None 이면 `page_url`, 프래그먼트는 하이픈 제거 32자. `kakao.send_to_me(access_token, text, link_url)`
-- 확인: `build_message_text` 가 `TEXT_LIMIT` 200 이내 (assert), 건수는 실제 발행 건수. 링크 도메인(`notion.so`)이 카카오 앱에 등록돼 있어야 버튼이 작동 — 코드가 아니라 콘솔 설정 (SPEC 8절)
-- 함정: 카카오 실패는 `_guard` 로 잡혀 `failures: kakao` 로 남고 종료 코드 1. Notion 은 `_guard` 밖 — 실패하면 프로세스가 죽고 `last_run.txt` 가 안 써진다
+- 생산자: `render_week_toggle` 이 만드는 토글 `rich_text` — **조각 2개**
+- 소비자: `notion.append_week_toggle` (쓰기), `notion.week_toggle_exists` (읽기·멱등성)
+- 확인: **`rich_text[0]` 은 라벨 텍스트, mention 은 그 뒤** (SPEC 5·9절 계약). `rich_text[0].plain_text` 가
+  `week_key` 로 시작해야 멱등성이 선다. mention 은 `{"type":"mention","mention":{"type":"user","user":{"object":"user","id":…}}}`
+  이며 `id` 는 `NOTION_USER_ID`. 건수는 실제 발행 건수이고 그 라벨이 곧 알림 문구 (SPEC 8절)
+- 함정 1: **mention 을 `rich_text[0]` 에 넣으면 매주 토글이 중복 생성된다.** 접두 일치가 사용자 이름을 보게 된다
+- 함정 2: 통합에 「이메일 주소를 제외한 사용자 정보 읽기」 권한이 없으면 append 가 `400 validation_error`
+  ("Could not find user with ID …"). **증상이 알림 누락이 아니라 그 주 미발행**이다 (SPEC 8절 "통합 권한")
+- 함정 3: Notion 은 `_guard` 밖 — 실패하면 프로세스가 죽고 `last_run.txt` 가 안 써진다.
+  알림이 토글과 한 몸이라 **발행과 알림이 함께 실패**한다. 토글이 없으므로 `workflow_dispatch` 로 회복된다
+- `block_anchor_url` 은 **로그 전용**이다 (SPEC 8절). None 이면 `page_url`, 프래그먼트는 하이픈 제거 32자 —
+  `logs/last_run.txt` 의 `notion:` 필드가 유일한 소비자이며 알림 경로에는 URL 이 쓰이지 않는다
 
 ## 9. 조립 (`Services`)
 
@@ -75,8 +83,11 @@ SKILL.md 경계면 표의 각 행을 실제 코드 위치와 fixture 가 심어 
 
 ## 10. 환경 변수
 
-- `.github/workflows/weekly_brief.yml` `env:` ↔ `config.REQUIRED`(7개) ↔ SPEC 12절 표
-- 확인: 이름 오타는 Actions 에서 `환경 변수 누락:` SystemExit 로만 드러난다. `KAKAO_CLIENT_SECRET` 은 선택(없으면 KOE010 가능), `GH_PAT` 은 토큰 자동 갱신 스텝에서만, `KAKAO_NEW_REFRESH_TOKEN_FILE` 은 워크플로우가 주입
+- `.github/workflows/weekly_brief.yml` `env:` ↔ `config.REQUIRED`(**6개**) ↔ SPEC 12절 표
+- 확인: 이름 오타는 Actions 에서 `환경 변수 누락:` SystemExit 로만 드러난다. v1.6 기준 필수 6개는
+  `NAVER_CLIENT_ID`/`NAVER_CLIENT_SECRET`·`GEMINI_API_KEY`·`NOTION_TOKEN`·`NOTION_ROOT_PAGE_ID`·`NOTION_USER_ID`.
+  **선택 항목이 하나도 없다** — 카카오 3키·`GH_PAT`·`KAKAO_NEW_REFRESH_TOKEN_FILE` 이 남아 있으면 drift
+- 확인: `NOTION_TOKEN` 은 값뿐 아니라 **권한**도 맞아야 한다 — 콘텐츠 읽기·삽입 + 「이메일 주소를 제외한 사용자 정보 읽기」 (SPEC 12절)
 
 ## 11. fixture ↔ 근거표
 

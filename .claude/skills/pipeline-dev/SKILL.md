@@ -1,6 +1,6 @@
 ---
 name: pipeline-dev
-description: "tech-news-orchestrator 가 pipeline-engineer 에게 시키는 하위 절차 — 사용자 요청은 오케스트레이터가 먼저 받는다. 주간 테크 뉴스 브리핑 파이프라인 src/·tests/·.github/workflows/ 구현 규약: 모듈 맵(18개 모듈의 역할·SPEC 절·순수/네트워크·테스트·튜닝 상수), Services 주입·_guard 격리·KST·article_id/extra 키 계약, 금지 항목, 테스트 우선 변경 절차, dry-run 실측 명령과 비용, fixture 갱신 규칙, 커밋 규약(푸시 금지). 수집기·랭킹·보강·요약·Notion·카카오·진입점·워크플로우 코드를 고치거나 키워드·임계값·타임아웃·publisher 표를 튜닝하는 에이전트는 이 스킬을 읽는다. SPEC 규칙 자체를 바꾸는 일은 spec-change 가 먼저다."
+description: "tech-news-orchestrator 가 pipeline-engineer 에게 시키는 하위 절차 — 사용자 요청은 오케스트레이터가 먼저 받는다. 주간 테크 뉴스 브리핑 파이프라인 src/·tests/·.github/workflows/ 구현 규약: 모듈 맵(17개 모듈의 역할·SPEC 절·순수/네트워크·테스트·튜닝 상수), Services 주입·_guard 격리·KST·article_id/extra 키 계약, 금지 항목, 테스트 우선 변경 절차, dry-run 실측 명령과 비용, fixture 갱신 규칙, 커밋 규약(푸시 금지). 수집기·랭킹·보강·요약·Notion·알림(멘션)·진입점·워크플로우 코드를 고치거나 키워드·임계값·타임아웃·publisher 표를 튜닝하는 에이전트는 이 스킬을 읽는다. SPEC 규칙 자체를 바꾸는 일은 spec-change 가 먼저다."
 ---
 
 # 파이프라인 구현 규약
@@ -14,7 +14,7 @@ description: "tech-news-orchestrator 가 pipeline-engineer 에게 시키는 하�
 | 항목 | 값 | 비고 |
 |------|-----|------|
 | 인터프리터 | `python3` (3.10) | `python` 명령은 **없다** |
-| 테스트 | `python3 -m pytest -q` | 기준선 216 passed (2026-09-09). `pytest.ini` 가 ROS 2 플러그인을 `-p no:` 로 끈다 — 지우지 말 것 |
+| 테스트 | `python3 -m pytest -q` | 기준선 **221 passed** (SPEC v1.6 반영 후, 2026-09-09). `pytest.ini` 가 ROS 2 플러그인을 `-p no:` 로 끈다 — 지우지 말 것 |
 | 의존성 | `pip install -r requirements-dev.txt` | 실행 의존성은 `trafilatura` 뿐. 나머지는 표준 라이브러리 |
 | 실행 | `python3 -m src.main [--dry-run] [--no-llm] [--date YYYY-MM-DD]` | 아래 "실측" 참조 |
 | 자격 증명 | 로컬 `.env` (gitignore) / Actions Secrets | `config.Settings.from_env()` 가 `REQUIRED` 7개를 검사 |
@@ -36,14 +36,13 @@ description: "tech-news-orchestrator 가 pipeline-engineer 에게 시키는 하�
 | `enrich.py` | 해외 상위 5건 원문 fetch → 앞 1500자 (`extra.enrich_*`) | 6.5절 | 네트워크 (주입 가능) | `test_enrich` | `ENRICH_TIMEOUT`, `MAX_CHARS`, `MIN_CHARS` |
 | `summarize.py` | Gemini 배치 요약 + 2단 fallback | 7절 | 네트워크 (`call` 주입) | `test_summarize` | `GEMINI_MODEL`, `MAX_CHARS_PER_SENTENCE`, `FALLBACK_CHARS` |
 | `render_notion.py` | 주차 토글 블록 + 텍스트 렌더 | 4·5절 | 순수 | `test_render_notion` | `EMPTY_SECTION_TEXT`, `SOURCE_COLOR` |
-| `notion.py` | 월 페이지·토글 존재 확인·append·앵커 URL | 5·8·9절 | 네트워크 | `test_notion_kakao` | `NOTION_VERSION`, `PAGE_SIZE` |
-| `kakao.py` | 토큰 갱신 + 나에게 보내기 | 8절 | 네트워크 (`post_form` 주입) | `test_notion_kakao` | `TEXT_LIMIT`(200), `BUTTON_TITLE` |
+| `notion.py` | 월 페이지·토글 존재 확인·append·앵커 URL(로그 전용) | 5·8·9절 | 네트워크 | `test_notion` | `NOTION_VERSION`, `PAGE_SIZE` |
 | `http.py` | 공용 HTTP (GET JSON/텍스트, POST form) | — | 네트워크 | — | `DEFAULT_TIMEOUT`, `USER_AGENT` |
 | `config.py` | `.env`/Secrets → `Settings` | 12절 | 순수 | — | `REQUIRED` |
 | `main.py` | 진입점. `Services` 주입, `_guard` 격리, 실행 로그 | 2·3·9절 | 조립 | `test_main` (가짜 서비스로 끝까지) | — |
-| `scripts/kakao_refresh_token.py` | 최초 발급·재발급·시험 발송 | 8·12절 | 대화형 | — | — |
 
-파이프라인 순서(`main.run`, 3절 고정): 수집(국내 ∥ 해외 소스별) → 랭킹 → 예비 풀 보충 → 보강(해외) → 요약(섹션당 1회) → 멱등성 → Notion → 카카오 → 로그.
+파이프라인 순서(`main.run`, 3절 고정): 수집(국내 ∥ 해외 소스별) → 랭킹 → 예비 풀 보충 → 보강(해외) → 요약(섹션당 1회) → 멱등성 → Notion(토글 + 멘션 = 알림) → 로그.
+**별도 알림 단계가 없다** — v1.6에서 멘션이 토글 페이로드 안으로 들어갔다 (SPEC 3절 유의점 2).
 
 ## 구현 규약 — 왜 그런지와 함께
 
@@ -79,7 +78,8 @@ description: "tech-news-orchestrator 가 pipeline-engineer 에게 시키는 하�
 SPEC 이 고정한 결정은 `spec-change` 스킬 2절 표에 있다. 코드 관점에서 특히 자주 유혹받는 것:
 
 - 멱등성 체크를 Gemini 앞으로 옮기기 (3절 유의점 3) — 비용 절감처럼 보이지만 금지
-- 카카오 실패 대비 상태 파일·재시도 추가 (9절) — 알려진 한계로 감수하기로 했다
+- 알림 실패 대비 상태 파일·재시도 추가 (9절). **특히 mention 을 빼고 재시도하는 fallback** — 성공하면 멘션 없는 토글이 생겨 멱등성이 그 주를 영구히 막는다 (SPEC 8절)
+- 토글 `rich_text[0]` 자리에 mention 을 넣는 것 (5·9절) — 멱등성 접두 일치가 깨져 매주 토글이 중복된다
 - `SummaryStatus` 에 fallback 원천 값 추가 (7절) — `summary_lines` 길이로 재구성 가능
 - `publishers.py` 에 국내/해외 분기 로직 넣기 (6절)
 - 40자 초과 문장 자르기 (7절) — 경고만
@@ -105,9 +105,9 @@ incremental QA 가 실제로 돌려면 검증자 알림이 **모듈마다** 나�
 
 | 명령 | 하는 일 | 비용·부작용 |
 |------|--------|-----------|
-| `python3 -m src.main --dry-run --no-llm --date 2026-09-08` | 수집·랭킹·보강까지 실제로 돌고 요약은 전부 fallback. 결과를 stdout 에 렌더 | 네이버·HN·RSS·원문 사이트를 **실제 호출** (네이버 일 한도 소모, arXiv 3초 간격). Gemini 비용 0, Notion·카카오 안 씀, `logs/last_run.txt` 안 씀. **`.env` 에 `config.REQUIRED` 7개 키가 전부 있어야 뜬다** — dry-run 이라도 `Settings.from_env()` 를 통과해야 한다 |
+| `python3 -m src.main --dry-run --no-llm --date 2026-09-08` | 수집·랭킹·보강까지 실제로 돌고 요약은 전부 fallback. 결과를 stdout 에 렌더 | 네이버·HN·RSS·원문 사이트를 **실제 호출** (네이버 일 한도 소모, arXiv 3초 간격). Gemini 비용 0, Notion 안 씀, `logs/last_run.txt` 안 씀. **`.env` 에 `config.REQUIRED` 키가 전부 있어야 뜬다** (v1.6 기준 6개) — dry-run 이라도 `Settings.from_env()` 를 통과해야 한다 |
 | `python3 -m src.main --dry-run` | 위 + Gemini 요약 | Gemini 소액 과금 |
-| `python3 -m src.main` | **실제 발행** | Notion 에 토글이 생기고 카톡이 간다. 멱등성 때문에 그 주는 다시 못 돌린다. **로컬에서 돌리지 않는다** |
+| `python3 -m src.main` | **실제 발행** | Notion 에 토글이 생기고 그 멘션이 알림을 띄운다. 멱등성 때문에 그 주는 다시 못 돌린다. **로컬에서 돌리지 않는다** |
 
 `--date` 는 비월요일이면 그 주 월요일로 스냅된다(`week.current_week`). 지난주를 재현하려면 지난 월요일 날짜를 준다.
 실측 결과(건수, 상위 5건 제목, 이상 징후)는 changes 파일과 커밋 메시지에 "실측 반영:" 으로 남긴다.

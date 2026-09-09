@@ -10,6 +10,7 @@ import pytest
 
 from src.render_notion import (
     EMPTY_SECTION_TEXT,
+    mention,
     render_brief_text,
     render_item,
     render_item_text,
@@ -19,6 +20,7 @@ from src.render_notion import (
 from src.schema import BriefItem, WeekMeta, WeeklyBrief
 
 FIXTURES = Path(__file__).parent / "fixtures"
+USER_ID = "1cfd872b-0000-4000-8000-000000000000"   # 알림 멘션 대상 (SPEC 12절 NOTION_USER_ID)
 
 
 def _load(name: str):
@@ -35,7 +37,8 @@ def brief() -> WeeklyBrief:
 
 
 def _contents(block: dict) -> list[str]:
-    return [p["text"]["content"] for p in block[block["type"]]["rich_text"]]
+    """텍스트 조각의 content 만. mention 조각에는 `text` 키가 없다 (SPEC 5절 토글 rich_text 표)."""
+    return [p["text"]["content"] for p in block[block["type"]]["rich_text"] if p["type"] == "text"]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -44,14 +47,31 @@ def _contents(block: dict) -> list[str]:
 
 
 def test_toggle_label_uses_actual_counts(brief):
-    toggle = render_week_toggle(brief)
+    toggle = render_week_toggle(brief, USER_ID)
     assert toggle["type"] == "toggle"
     assert _contents(toggle) == ["8월 2주 (08/10~08/16) · 국내 3 / 해외 5"]
     assert toggle_label(brief.week, 0, 5) == "8월 2주 (08/10~08/16) · 국내 0 / 해외 5"
 
 
+def test_mention_piece_matches_notion_api_shape():
+    # SPEC 11절 확인값 (2026-09-09 실측). 이 형식이 아니면 append 가 400 으로 죽는다
+    assert mention(USER_ID) == {
+        "type": "mention",
+        "mention": {"type": "user", "user": {"object": "user", "id": USER_ID}},
+    }
+
+
+def test_toggle_rich_text_is_label_then_mention(brief):
+    # SPEC 9절 계약: 라벨이 rich_text[0]. mention 을 앞에 두면 멱등성이 깨져 매주 토글이 중복된다
+    rich = render_week_toggle(brief, USER_ID)["toggle"]["rich_text"]
+    assert len(rich) == 2
+    assert rich[0]["type"] == "text"
+    assert rich[0]["text"]["content"].startswith(brief.week.week_key)
+    assert rich[1] == mention(USER_ID)
+
+
 def test_children_layout_heading_then_one_paragraph_per_item(brief):
-    children = render_week_toggle(brief)["toggle"]["children"]
+    children = render_week_toggle(brief, USER_ID)["toggle"]["children"]
     kinds = [b["type"] for b in children]
     assert kinds == ["heading_3"] + ["paragraph"] * 3 + ["heading_3"] + ["paragraph"] * 5   # 10 블록, 항목당 1개
     assert _contents(children[0]) == ["국내"] and _contents(children[4]) == ["해외"]
@@ -89,7 +109,7 @@ def test_fallback_items_shrink_summary_pieces_instead_of_padding(brief):
 
 
 def test_no_indentation_and_no_bare_urls_in_blocks(brief):
-    toggle = render_week_toggle(brief)
+    toggle = render_week_toggle(brief, USER_ID)
     for block in toggle["toggle"]["children"]:
         for content in _contents(block):
             assert not content.startswith("    ")                        # 4절의 4칸 들여쓰기는 재현하지 않는다
@@ -98,19 +118,19 @@ def test_no_indentation_and_no_bare_urls_in_blocks(brief):
 
 def test_empty_section_keeps_heading_with_placeholder(brief):
     only_overseas = replace(brief, domestic=())
-    children = render_week_toggle(only_overseas)["toggle"]["children"]
+    children = render_week_toggle(only_overseas, USER_ID)["toggle"]["children"]
     assert [b["type"] for b in children[:2]] == ["heading_3", "paragraph"]
     assert _contents(children[0]) == ["국내"] and _contents(children[1]) == [EMPTY_SECTION_TEXT]
-    assert _contents(render_week_toggle(only_overseas)) == ["8월 2주 (08/10~08/16) · 국내 0 / 해외 5"]
+    assert _contents(render_week_toggle(only_overseas, USER_ID)) == ["8월 2주 (08/10~08/16) · 국내 0 / 해외 5"]
 
 
 def test_both_empty_makes_no_toggle(brief):
-    assert render_week_toggle(replace(brief, domestic=(), overseas=())) is None
+    assert render_week_toggle(replace(brief, domestic=(), overseas=()), USER_ID) is None
 
 
 def test_items_are_ordered_by_rank_even_if_input_is_shuffled(brief):
     shuffled = replace(brief, overseas=tuple(reversed(brief.overseas)))
-    children = render_week_toggle(shuffled)["toggle"]["children"]
+    children = render_week_toggle(shuffled, USER_ID)["toggle"]["children"]
     assert [_contents(b)[0] for b in children[5:]] == ["1. ", "2. ", "3. ", "4. ", "5. "]
 
 

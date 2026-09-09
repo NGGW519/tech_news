@@ -1,17 +1,12 @@
-"""src/notion.py · src/kakao.py — 가짜 HTTP 로 멱등성·append·링크·토큰·발송 계약 검증."""
+"""src/notion.py — 가짜 HTTP 로 월 페이지·멱등성·append·앵커 URL 계약 검증."""
 
 from __future__ import annotations
 
-import json
-from datetime import date
-
-import pytest
-
-from src.kakao import KakaoError, build_message_text, refresh_access_token, send_to_me
 from src.notion import NOTION_API, NotionApi, block_anchor_url, page_url
-from src.week import compute_week
+from src.render_notion import mention
 
 ROOT = "11111111-2222-3333-4444-555555555555"
+USER_ID = "1cfd872b-0000-4000-8000-000000000000"   # 알림 멘션 대상 (SPEC 12절 NOTION_USER_ID)
 
 
 class FakeNotion:
@@ -46,6 +41,16 @@ def _toggle(text):
     return {"type": "toggle", "toggle": {"rich_text": [{"plain_text": text}]}}
 
 
+def _toggle_with_mention(text):
+    """실제로 우리가 만드는 토글의 모양 — 라벨 뒤에 mention (SPEC 5절 표).
+
+    Notion 이 돌려주는 mention 조각의 `plain_text` 는 사용자 이름이다. 그것이 `rich_text[1]` 에
+    있는 한 멱등성 판정은 영향받지 않는다 — 판정은 `[0]` 만 본다 (SPEC 9절).
+    """
+    piece = dict(mention(USER_ID), plain_text="@건우 남궁")
+    return {"type": "toggle", "toggle": {"rich_text": [{"plain_text": text}, piece]}}
+
+
 def test_month_page_reuse_and_create():
     fake = FakeNotion({"2026-07": "p7", "2026-08": "p8"}, [])
     api = NotionApi("tok", fake.get_json, fake.post_json, fake.patch_json)
@@ -66,6 +71,19 @@ def test_idempotency_uses_week_key_prefix_only():
     assert api.week_toggle_exists("p8", "8월") is True                         # 접두 일치의 의미 그대로
 
 
+def test_idempotency_holds_when_toggle_carries_a_mention():
+    # SPEC 9절 계약: mention 이 rich_text[0] 뒤에 있는 한 접두 일치가 유지된다.
+    # 앞에 넣으면 첫 조각의 plain_text 가 사용자 이름이 되어 매주 토글이 중복 생성된다
+    blocks = [_toggle_with_mention("8월 2주 (08/10~08/16) · 국내 3 / 해외 5")]
+    api = NotionApi("tok", *[getattr(FakeNotion({}, blocks), m) for m in ("get_json", "post_json", "patch_json")])
+    assert api.week_toggle_exists("p8", "8월 2주") is True
+    assert api.week_toggle_exists("p8", "8월 4주") is False
+
+    reversed_blocks = [{"type": "toggle", "toggle": {"rich_text": list(reversed(blocks[0]["toggle"]["rich_text"]))}}]
+    api2 = NotionApi("tok", *[getattr(FakeNotion({}, reversed_blocks), m) for m in ("get_json", "post_json", "patch_json")])
+    assert api2.week_toggle_exists("p8", "8월 2주") is False       # 순서를 뒤집으면 이렇게 깨진다
+
+
 def test_append_returns_block_id_and_anchor_url():
     fake = FakeNotion({}, [])
     api = NotionApi("tok", fake.get_json, fake.post_json, fake.patch_json)
@@ -76,54 +94,3 @@ def test_append_returns_block_id_and_anchor_url():
     assert patch[1] == f"{NOTION_API}/blocks/p8-id/children" and patch[2] == {"children": [block]}
     assert block_anchor_url("1111-2222", block_id) == "https://www.notion.so/11112222#aaaabbbb"
     assert block_anchor_url("1111-2222", None) == page_url("1111-2222") == "https://www.notion.so/11112222"
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 카카오
-# ─────────────────────────────────────────────────────────────────────────────
-
-
-def test_message_text_matches_spec_8_and_fits_limit():
-    week = compute_week(date(2026, 9, 7))
-    text = build_message_text(week, 3, 5)
-    assert text == "📡 이번 주 테크 브리핑 · 국내 3 / 해외 5\n9월 1주 (08/31~09/06)"
-    assert len(text) <= 200
-
-
-def test_refresh_token_flow_with_and_without_rotation():
-    calls = []
-
-    def fake(url, form, headers=None):
-        calls.append((url, dict(form)))
-        return {"access_token": "acc", "expires_in": 43199} if "client_secret" in form else \
-               {"access_token": "acc2", "refresh_token": "new-r", "refresh_token_expires_in": 100}
-
-    t = refresh_access_token("rest", "old-r", "sec", post_form=fake)
-    assert t.access_token == "acc" and t.new_refresh_token is None
-    assert calls[0][1] == {"grant_type": "refresh_token", "client_id": "rest", "refresh_token": "old-r", "client_secret": "sec"}
-    t2 = refresh_access_token("rest", "old-r", None, post_form=fake)
-    assert t2.new_refresh_token == "new-r" and "client_secret" not in calls[1][1]
-
-
-def test_refresh_failure_raises():
-    with pytest.raises(KakaoError):
-        refresh_access_token("rest", "r", post_form=lambda u, f, h=None: {"error": "invalid_grant", "error_code": "KOE319"})
-
-
-def test_send_to_me_template_and_result_check():
-    calls = []
-
-    def fake(url, form, headers=None):
-        calls.append((url, dict(form), dict(headers or {})))
-        return {"result_code": 0}
-
-    send_to_me("acc", "본문", "https://www.notion.so/abc#def", post_form=fake)
-    url, form, headers = calls[0]
-    assert url == "https://kapi.kakao.com/v2/api/talk/memo/default/send"
-    assert headers == {"Authorization": "Bearer acc"}
-    template = json.loads(form["template_object"])
-    assert template == {"object_type": "text", "text": "본문",
-                        "link": {"web_url": "https://www.notion.so/abc#def", "mobile_web_url": "https://www.notion.so/abc#def"},
-                        "button_title": "Notion에서 보기"}
-    with pytest.raises(KakaoError):
-        send_to_me("acc", "x", "u", post_form=lambda u, f, h=None: {"result_code": -401})

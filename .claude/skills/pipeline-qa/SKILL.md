@@ -1,11 +1,11 @@
 ---
 name: pipeline-qa
-description: "tech-news-orchestrator 가 pipeline-qa 에이전트에게 시키는 하위 절차 — 사용자 요청은 오케스트레이터가 먼저 받는다. 주간 테크 뉴스 브리핑 파이프라인의 읽기 전용 검증 규약: pytest 회귀 기준선, 번들 검사기 check_fixtures.py 실행 규약(9개 검사군), 모듈 경계면 12종 교차 검증표(수집→랭킹→보강→요약→렌더→Notion→카카오, 생산자·소비자 파일 쌍), dry-run 출력의 SPEC 4절 대조 기준, incremental QA 순서, PASS/FAIL/미검증 리포트 형식. 코드 변경 직후 검증이나 SPEC 개정 후 코드 대조를 맡은 에이전트는 이 스킬을 읽는다. 코드를 고치는 규약은 pipeline-dev, SPEC 개정 판정은 spec-change."
+description: "tech-news-orchestrator 가 pipeline-qa 에이전트에게 시키는 하위 절차 — 사용자 요청은 오케스트레이터가 먼저 받는다. 주간 테크 뉴스 브리핑 파이프라인의 읽기 전용 검증 규약: pytest 회귀 기준선, 번들 검사기 check_fixtures.py 실행 규약(9개 검사군), 모듈 경계면 12종 교차 검증표(수집→랭킹→보강→요약→렌더→Notion, 생산자·소비자 파일 쌍), dry-run 출력의 SPEC 4절 대조 기준, incremental QA 순서, PASS/FAIL/미검증 리포트 형식. 코드 변경 직후 검증이나 SPEC 개정 후 코드 대조를 맡은 에이전트는 이 스킬을 읽는다. 코드를 고치는 규약은 pipeline-dev, SPEC 개정 판정은 spec-change."
 ---
 
 # 파이프라인 검증 절차
 
-pytest 216개는 각 모듈을 **따로** 검증한다. 이 프로젝트에서 실제로 어긋나는 곳은 모듈 사이 — 한쪽이 쓰는
+pytest 기준선(221)은 각 모듈을 **따로** 검증한다. 이 프로젝트에서 실제로 어긋나는 곳은 모듈 사이 — 한쪽이 쓰는
 `extra` 키를 다른 쪽이 다른 이름으로 읽거나, 렌더러가 기대하는 문장 수와 요약기가 주는 문장 수가 다르거나,
 워크플로우의 환경 변수 이름과 `config.REQUIRED` 가 다른 곳이다. 그런 결함은 양쪽 파일을 **같이 열어야** 보인다.
 이 절차의 절반은 그 "같이 열기"의 목록이다.
@@ -14,9 +14,9 @@ pytest 216개는 각 모듈을 **따로** 검증한다. 이 프로젝트에서 �
 
 | 단계 | 명령 | 기대 |
 |------|------|------|
-| 회귀 | `python3 -m pytest -q` | passed ≥ 기준선(216, 2026-09-09). 실패 0 |
+| 회귀 | `python3 -m pytest -q` | passed ≥ 기준선(**221**, SPEC v1.6 반영 후 2026-09-09). 실패 0. **v1.6 알림 채널 교체 후에는 삭제 N건 / 신규 M건을 수치로 보고하고 `M ≥ N` 을 확인한다** — 총계만 맞추면 삭제분을 메웠는지 알 수 없다 |
 | fixture 정합성 | `python3 .claude/skills/pipeline-qa/scripts/check_fixtures.py` (`-v` 로 통과 항목도) | `N passed, 0 failed`, 종료 코드 0 |
-| 실측 | `python3 -m src.main --dry-run --no-llm --date {지난 월요일}` | stdout 에 SPEC 4절 형식 렌더. Gemini 비용 0, Notion·카카오 발행 없음. **전제:** `.env` 에 `config.REQUIRED` 7개 키가 있어야 뜬다(없으면 `환경 변수 누락` SystemExit). 네이버·HN·RSS 는 **실제 호출**된다 (네이버 일 한도 소모, arXiv 3초 간격) |
+| 실측 | `python3 -m src.main --dry-run --no-llm --date {지난 월요일}` | stdout 에 SPEC 4절 형식 렌더. Gemini 비용 0, Notion 발행 없음. **전제:** `.env` 에 `config.REQUIRED` 키가 전부 있어야 뜬다(v1.6 기준 6개)(없으면 `환경 변수 누락` SystemExit). 네이버·HN·RSS 는 **실제 호출**된다 (네이버 일 한도 소모, arXiv 3초 간격) |
 | 실측(요약 포함) | `python3 -m src.main --dry-run --date {지난 월요일}` | 위 + Gemini 요약. 소액 과금 — 요약 규칙 검증 때만 |
 
 **Reddit 은 제거된 소스다** (커밋 `bbd2e80`, SPEC 6절 "Reddit 을 뺀 이유"). 그런데 fixture 의 `reddit:*` 항목, `SourceKind.REDDIT`, `publisher_name` 의 `subreddit`/`is_self` 인자, `rank_overseas` 의 reddit 합성 공식은 **의도적으로 남아 있다** — 결함으로 적지 않는다. 반대로 코드 주석에 "HN+Reddit" 이 남아 있으면 그것은 낡은 주석이다.
@@ -51,11 +51,11 @@ engineer 가 "모듈 완성" 을 알리면 전체를 기다리지 않고 **그 �
 | 5 | 요약 → 렌더 | `BriefItem.summary_lines` (0/1/2개), `summary_status` | `render_notion.render_item`, SPEC 4절 예시 | 2문장/1문장/생략 세 경로. **fallback 원천 순서는 입력 순서와 반대**: `description` → `enrich_text` → 생략 (7절: `description` 이 이미 요약문 형태). 문자열 = `원천[:120].rstrip() + " ⚠️ 자동 요약 실패"`. 40자 초과는 자르지 않고 경고 |
 | 6 | Gemini 응답 → 파서 | `summarize.RESPONSE_SCHEMA` | 응답 매칭·형식 위반 처리 | `id` 로만 매칭(순서 무시), 없는 id → fallback, 3문장 이상 → 앞 2개, 0개 → fallback, JSON 파싱 실패 → 섹션 전체 fallback |
 | 7 | 주차 → 멱등성 | `week.compute_week` 의 `week_key`/`week_label` | `notion.week_toggle_exists` 접두 비교, `render_notion.toggle_label` | 비교는 `week_key`("9월 1주") 접두, 라벨은 건수 포함. 월/연 경계·5주차 케이스(`week_meta.json`) |
-| 8 | Notion → 카카오 | `append_week_toggle` 반환 `block_id` | `block_anchor_url` fallback, `kakao.send_to_me` 링크 | block_id None 이면 월 페이지 URL. 프래그먼트는 하이픈 없는 32자. 본문 ≤ 200자 |
+| 8 | 렌더 → Notion (알림) | `render_week_toggle` 의 토글 `rich_text` | `notion.week_toggle_exists`, `append_week_toggle` | **조각 2개: `[0]` 라벨 텍스트, mention 은 그 뒤** (SPEC 5·9절 계약). `rich_text[0].plain_text` 가 `week_key` 로 시작해야 멱등성이 선다. `block_anchor_url` 은 로그 전용 — block_id None 이면 월 페이지 URL, 프래그먼트는 하이픈 없는 32자 |
 | 9 | 조립 | `main.Services` 필드 | `build_services()`, `tests/test_main.py` 가짜 | 세 곳의 필드가 1:1. 새 해외 소스는 `overseas_collectors` dict |
-| 10 | 환경 | `.github/workflows/weekly_brief.yml` `env:` | `config.REQUIRED`, SPEC 12절 표 | 이름 일치. 선택 항목(`KAKAO_CLIENT_SECRET`, `GH_PAT`)은 REQUIRED 에 없어야 |
+| 10 | 환경 | `.github/workflows/weekly_brief.yml` `env:` | `config.REQUIRED`, SPEC 12절 표 | 이름 일치. v1.6 기준 필수 6개(`NAVER` 2 · `GEMINI_API_KEY` · `NOTION_TOKEN` · `NOTION_ROOT_PAGE_ID` · `NOTION_USER_ID`). 카카오 키·`GH_PAT` 이 남아 있으면 drift |
 | 11 | fixture ↔ 근거 | `tests/fixtures/*.json` | `README.md` 계산 근거표, `check_fixtures.SCHEMA_FILES` | 점수·순위·건수·`enrich_*` 상태표가 JSON 과 일치 |
-| 12 | 부분 발행 | `main.run` 의 0건 분기 | `render_week_toggle`, `kakao.build_message_text` | 한쪽 0건 → 헤더 유지 + `(해당 없음)`, 양쪽 0건 → 토글 없음·`nothing_to_publish`. 건수 표기가 실제 건수 |
+| 12 | 부분 발행 | `main.run` 의 0건 분기 | `render_week_toggle` | 한쪽 0건 → 헤더 유지 + `(해당 없음)`, 양쪽 0건 → 토글 없음·`nothing_to_publish` **(= 알림도 없음)**. 건수 표기가 실제 건수이고 그 라벨이 곧 알림 문구 (SPEC 8절) |
 
 ## 실측 출력 검토 (dry-run)
 

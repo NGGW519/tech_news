@@ -1,6 +1,6 @@
 ---
 name: pipeline-engineer
-description: "주간 테크 뉴스 파이프라인(src/) 구현·수정 전문가. 수집기(네이버·HN·RSS), 랭킹, 본문 보강, Gemini 요약, Notion 렌더, 카카오 알림, GitHub Actions 워크플로우를 SPEC 규약대로 고치고 테스트를 동반한다. 키워드: 구현, 수정, 튜닝, 임계값, 키워드 추가, 소스 추가/제거, publisher 표, 타임아웃, 재시도, 버그 수정, 워크플로우."
+description: "주간 테크 뉴스 파이프라인(src/) 구현·수정 전문가. 수집기(네이버·HN·RSS), 랭킹, 본문 보강, Gemini 요약, Notion 렌더·멘션 알림, GitHub Actions 워크플로우를 SPEC 규약대로 고치고 테스트를 동반한다. 키워드: 구현, 수정, 튜닝, 임계값, 키워드 추가, 소스 추가/제거, publisher 표, 타임아웃, 재시도, 버그 수정, 워크플로우."
 model: opus
 ---
 

@@ -5,7 +5,7 @@
     수집 (네이버 / HN·Reddit·RSS)  ->  RawArticle
     중복 제거 · 랭킹               ->  RankedArticle (+ RankEvidence)
     Gemini 요약                    ->  BriefItem
-    Notion 렌더링 · 카카오 알림     ->  WeeklyBrief (WeekMeta + BriefItem 목록)
+    Notion 렌더링 (+ 알림 멘션)     ->  WeeklyBrief (WeekMeta + BriefItem 목록)
     주차 계산 (목요일 앵커)         ->  WeekMeta
 
 ── 국내/해외 비대칭 처리 원칙 ────────────────────────────────────────────────
@@ -341,7 +341,9 @@ class BriefItem:
 
 @dataclass(frozen=True)
 class WeekMeta:
-    """주차 계산 결과. Notion 월 페이지·주차 토글·멱등성 체크·카톡 문구의 공통 입력.
+    """주차 계산 결과. Notion 월 페이지·주차 토글·멱등성 체크·알림 문구의 공통 입력.
+
+    토글 라벨이 곧 알림 문구다 — 별도 알림 본문은 없다 (SPEC 8절).
 
     모든 필드는 **KST 달력 기준 date** 다 (SPEC 5절). Actions 런너는 UTC 이므로
     이 값을 만드는 쪽에서 반드시 KST 로 변환한 뒤 채운다.
@@ -411,7 +413,7 @@ class WeekMeta:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 5. WeeklyBrief — 한 주치 결과 묶음 (Notion 렌더러 · 카카오 알림의 단일 입력)
+# 5. WeeklyBrief — 한 주치 결과 묶음 (Notion 렌더러의 단일 입력. 알림도 그 산출물 안에 있다)
 # ─────────────────────────────────────────────────────────────────────────────
 
 

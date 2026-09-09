@@ -1,13 +1,13 @@
 """파이프라인 진입점 (SPEC 3절 순서 고정).
 
-    수집(국내·해외) → 랭킹 → 예비 풀 보충 → 본문 보강(해외) → 요약 → 멱등성 체크 → Notion → 카카오 → 실행 로그
+    수집(국내·해외) → 랭킹 → 예비 풀 보충 → 본문 보강(해외) → 요약 → 멱등성 체크 → Notion(+알림 멘션) → 실행 로그
 
 모든 외부 호출은 `Services` 로 주입한다. 테스트는 전부 가짜로 채워 fixture 만으로 끝까지 돈다.
 한쪽 수집이 통째로 죽어도 다른 쪽은 발행한다 (SPEC 2절 부분 발행). 그런 실패가 있었으면 종료 코드 1 로
 Actions 실패 알림을 울리되, 발행 자체는 끝낸 뒤다.
 
     python -m src.main                 # 실제 실행 (.env 또는 Secrets)
-    python -m src.main --dry-run       # Notion·카카오에 쓰지 않고 결과만 출력
+    python -m src.main --dry-run       # Notion 에 쓰지 않고 결과만 출력
     python -m src.main --no-llm        # Gemini 를 부르지 않는다 (전부 fallback) — 비용 없이 수집·랭킹 점검
     python -m src.main --date 2026-08-17
 """
@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import argparse
 import logging
-import os
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass, replace
@@ -24,7 +23,6 @@ from datetime import date, datetime, time
 from functools import partial
 from pathlib import Path
 
-from src import kakao
 from src.collect_hn import collect_hn
 from src.collect_naver import collect_domestic
 from src.collect_rss import collect_rss
@@ -51,9 +49,7 @@ class Services:
     summarize_call: Call
     notion: NotionApi
     notion_root_page_id: str
-    kakao_refresh: Callable[[], kakao.Tokens]
-    kakao_send: Callable[[str, str, str], None]          # (access_token, text, link_url)
-    persist_refresh_token: Callable[[str], None]
+    notion_user_id: str                                  # 주차 토글에 넣는 알림 멘션 대상 (SPEC 8절)
     log_file: Path = LOG_FILE
 
 
@@ -81,15 +77,6 @@ def _no_llm_call(_: dict) -> dict:
 
 
 def build_services(settings: Settings, *, no_llm: bool = False) -> Services:
-    def persist(new_token: str) -> None:
-        path = os.environ.get("KAKAO_NEW_REFRESH_TOKEN_FILE")
-        if path:
-            Path(path).write_text(new_token, encoding="utf-8")
-            log.warning("새 refresh token 을 %s 에 썼다 — 워크플로우가 Secrets 를 갱신한다", path)
-        else:
-            log.warning("새 refresh token 이 발급됐지만 저장 경로(KAKAO_NEW_REFRESH_TOKEN_FILE)가 없다. "
-                        "만료 전에 scripts/kakao_refresh_token.py 로 재발급하라")
-
     return Services(
         collect_domestic=lambda week: collect_domestic(
             week, client_id=settings.naver_client_id, client_secret=settings.naver_client_secret),
@@ -101,10 +88,7 @@ def build_services(settings: Settings, *, no_llm: bool = False) -> Services:
         summarize_call=_no_llm_call if no_llm else partial(call_gemini, api_key=settings.gemini_api_key),
         notion=NotionApi(settings.notion_token),
         notion_root_page_id=settings.notion_root_page_id,
-        kakao_refresh=lambda: kakao.refresh_access_token(
-            settings.kakao_rest_api_key, settings.kakao_refresh_token, settings.kakao_client_secret),
-        kakao_send=kakao.send_to_me,
-        persist_refresh_token=persist,
+        notion_user_id=settings.notion_user_id,
     )
 
 
@@ -177,22 +161,19 @@ def run(services: Services, *, now: datetime | None = None, dry_run: bool = Fals
         log.info("%s 토글이 이미 있다 — 종료 (멱등성)", week.week_key)
         return _finish(services, replace(result, status="already_exists"), brief, dry_run)
 
-    # 6. Notion
-    block_id = services.notion.append_week_toggle(month_page_id, render_week_toggle(brief))
+    # 6. Notion — 알림이 이 호출 안에 있다. 토글 라벨 뒤의 mention 조각이 곧 푸시다 (SPEC 8절).
+    #    통합에 사용자 정보 읽기 권한이 없으면 여기서 400 으로 죽고 발행·알림이 함께 무산된다.
+    #    멘션을 빼고 재시도하지 않는다 — 멘션 없는 토글이 만들어지면 멱등성이 그 주를 영구히 막는다 (SPEC 8·9절).
+    toggle = render_week_toggle(brief, services.notion_user_id)
+    block_id = services.notion.append_week_toggle(month_page_id, toggle)
     link = block_anchor_url(month_page_id, block_id)
     if not block_id:
-        log.warning("토글 블록 id 를 못 얻었다 — 월 페이지 URL 로 fallback")
+        log.warning("토글 블록 id 를 못 얻었다 — 월 페이지 URL 로 fallback (로그 전용, SPEC 8절)")
     log.info("notion written: %s", link)
 
-    # 7. 카카오 — Notion 뒤 (링크가 필요하다). 실패해도 Notion 에는 남는다 (SPEC 9절 알려진 한계)
-    def send() -> None:
-        tokens = services.kakao_refresh()
-        services.kakao_send(tokens.access_token, kakao.build_message_text(week, len(brief.domestic), len(brief.overseas)), link)
-        if tokens.new_refresh_token:
-            services.persist_refresh_token(tokens.new_refresh_token)
-    _guard("kakao", send, None, failures)
-
-    return _finish(services, replace(result, status="published", notion_link=link, failures=tuple(failures)), brief, dry_run)
+    # failures 는 148행에서 이미 result 에 담겼다 — 마지막 _guard 가 139행(enrich)이라 그 뒤로 늘지 않는다.
+    # 카카오 단계가 있던 v1.5 에서는 여기서 다시 담아야 했다 (SPEC v1.6 에서 그 단계가 사라졌다)
+    return _finish(services, replace(result, status="published", notion_link=link), brief, dry_run)
 
 
 def _finish(services: Services, result: RunResult, brief: WeeklyBrief, dry_run: bool) -> RunResult:
@@ -225,7 +206,7 @@ def write_run_log(path: Path, result: RunResult, brief: WeeklyBrief) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="주간 테크 뉴스 브리핑")
-    parser.add_argument("--dry-run", action="store_true", help="Notion·카카오에 쓰지 않는다")
+    parser.add_argument("--dry-run", action="store_true", help="Notion 에 쓰지 않는다")
     parser.add_argument("--no-llm", action="store_true", help="Gemini 를 부르지 않는다 (전부 fallback)")
     parser.add_argument("--date", type=date.fromisoformat, help="실행일을 지정한다 (YYYY-MM-DD, KST)")
     args = parser.parse_args(argv)

@@ -1,8 +1,8 @@
-run_at: 2026-11-16T11:44:25+09:00
-week: 11월 2주 (11/09~11/15)
+run_at: 2026-11-23T12:44:12+09:00
+week: 11월 3주 (11/16~11/22)
 domestic: 5
 overseas: 5
 summary: gemini 10 / fallback 0
 status: published
-notion: https://www.notion.so/41389209382a810cb031e36049d7c81e#41a89209382a81358e35e3b7496a589c
+notion: https://www.notion.so/41389209382a810cb031e36049d7c81e#42189209382a8130a6a5e39eccc7a52c
 failures: -
